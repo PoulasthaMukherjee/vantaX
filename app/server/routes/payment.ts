@@ -8,7 +8,8 @@ import { candidateConfirmationEmail, candidateNotificationEmail } from '../email
 
 const router = Router();
 
-const CASHFREE_API = process.env.CASHFREE_ENV === 'production'
+const isProduction = (process.env.CASHFREE_ENV || '').toLowerCase() === 'production';
+const CASHFREE_API = isProduction
   ? 'https://api.cashfree.com/pg/orders'
   : 'https://sandbox.cashfree.com/pg/orders';
 
@@ -65,7 +66,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
     res.json({
       orderId: data.order_id,
       paymentSessionId: data.payment_session_id,
-      cfEnvironment: process.env.CASHFREE_ENV === 'production' ? 'production' : 'sandbox',
+      cfEnvironment: isProduction ? 'production' : 'sandbox',
     });
   } catch (e) {
     console.error('Create order error:', e);
