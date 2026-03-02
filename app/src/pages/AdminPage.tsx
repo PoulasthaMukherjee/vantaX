@@ -172,6 +172,32 @@ function countRecent(values: Array<{ createdAt: string | null }>, hours: number)
   }).length;
 }
 
+function escapeCsvCell(value: string | number | null | undefined) {
+  const normalized = value == null ? '' : String(value);
+  const escaped = normalized.replace(/"/g, '""');
+  return `"${escaped}"`;
+}
+
+function toCsv<Row extends Record<string, unknown>>(rows: Row[], columns: Array<{ key: keyof Row; label: string }>) {
+  const header = columns.map((column) => escapeCsvCell(column.label)).join(',');
+  const body = rows.map((row) =>
+    columns
+      .map((column) => {
+        const rawValue = row[column.key];
+        const normalized =
+          typeof rawValue === 'string' || typeof rawValue === 'number'
+            ? rawValue
+            : rawValue == null
+              ? ''
+              : JSON.stringify(rawValue);
+        return escapeCsvCell(normalized);
+      })
+      .join(','),
+  );
+
+  return [header, ...body].join('\n');
+}
+
 function buildActivityFeed(data: RegistrationResponse | null, query: string) {
   if (!data) {
     return [] as ActivityItem[];
@@ -437,13 +463,117 @@ export default function AdminPage() {
       return;
     }
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const objectUrl = window.URL.createObjectURL(blob);
-    const anchor = window.document.createElement('a');
-    anchor.href = objectUrl;
-    anchor.download = `vantax-registrations-${new Date().toISOString().slice(0, 19)}.json`;
-    anchor.click();
-    window.URL.revokeObjectURL(objectUrl);
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const downloadFile = (filename: string, csv: string) => {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const objectUrl = window.URL.createObjectURL(blob);
+      const anchor = window.document.createElement('a');
+      anchor.href = objectUrl;
+      anchor.download = filename;
+      anchor.click();
+      window.URL.revokeObjectURL(objectUrl);
+    };
+
+    const candidateColumns: Array<{ key: keyof Candidate; label: string }> = [
+      { key: 'id', label: 'ID' },
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'phone', label: 'Phone' },
+      { key: 'linkedinUrl', label: 'LinkedIn URL' },
+      { key: 'resumePath', label: 'Resume Path' },
+      { key: 'college', label: 'College' },
+      { key: 'graduationYear', label: 'Graduation Year' },
+      { key: 'degreeBranch', label: 'Degree Branch' },
+      { key: 'referralSource', label: 'Referral Source' },
+      { key: 'paymentStatus', label: 'Payment Status' },
+      { key: 'paymentId', label: 'Payment ID' },
+      { key: 'createdAt', label: 'Created At' },
+    ];
+
+    const companyColumns: Array<{ key: keyof Company; label: string }> = [
+      { key: 'id', label: 'ID' },
+      { key: 'companyName', label: 'Company Name' },
+      { key: 'websiteUrl', label: 'Website URL' },
+      { key: 'industry', label: 'Industry' },
+      { key: 'companyStage', label: 'Company Stage' },
+      { key: 'contactName', label: 'Contact Name' },
+      { key: 'contactRole', label: 'Contact Role' },
+      { key: 'contactEmail', label: 'Contact Email' },
+      { key: 'contactPhone', label: 'Contact Phone' },
+      { key: 'problemTitle', label: 'Problem Title' },
+      { key: 'businessContext', label: 'Business Context' },
+      { key: 'coreTask', label: 'Core Task' },
+      { key: 'expectedDeliverables', label: 'Expected Deliverables' },
+      { key: 'preferredStack', label: 'Preferred Stack' },
+      { key: 'toolRestrictions', label: 'Tool Restrictions' },
+      { key: 'difficultyLevel', label: 'Difficulty Level' },
+      { key: 'nominateJury', label: 'Nominate Jury' },
+      { key: 'juryName', label: 'Jury Name' },
+      { key: 'juryDesignation', label: 'Jury Designation' },
+      { key: 'customEvalCriteria', label: 'Custom Eval Criteria' },
+      { key: 'hiringIntent', label: 'Hiring Intent' },
+      { key: 'approxOpenings', label: 'Approx Openings' },
+      { key: 'skillsLookingFor', label: 'Skills Looking For' },
+      { key: 'confirmations', label: 'Confirmations' },
+      { key: 'createdAt', label: 'Created At' },
+    ];
+
+    const juryColumns: Array<{ key: keyof JuryMember; label: string }> = [
+      { key: 'id', label: 'ID' },
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'linkedinUrl', label: 'LinkedIn URL' },
+      { key: 'currentRole', label: 'Current Role' },
+      { key: 'company', label: 'Company' },
+      { key: 'domainExpertise', label: 'Domain Expertise' },
+      { key: 'yearsExperience', label: 'Years Experience' },
+      { key: 'availability', label: 'Availability' },
+      { key: 'motivation', label: 'Motivation' },
+      { key: 'createdAt', label: 'Created At' },
+    ];
+
+    if (activePanel === 'overview' || activePanel === 'candidates') {
+      downloadFile(
+        `vantax-candidates-${timestamp}.csv`,
+        toCsv(
+          filteredCandidates.map((row) => ({
+            ...row,
+            createdAt: formatDateTime(row.createdAt),
+          })),
+          candidateColumns,
+        ),
+      );
+    }
+
+    if (activePanel === 'overview' || activePanel === 'companies') {
+      downloadFile(
+        `vantax-companies-${timestamp}.csv`,
+        toCsv(
+          filteredCompanies.map((row) => ({
+            ...row,
+            expectedDeliverables: formatStoredValue(row.expectedDeliverables),
+            skillsLookingFor: formatStoredValue(row.skillsLookingFor),
+            confirmations: formatStoredValue(row.confirmations),
+            createdAt: formatDateTime(row.createdAt),
+          })),
+          companyColumns,
+        ),
+      );
+    }
+
+    if (activePanel === 'overview' || activePanel === 'jury') {
+      downloadFile(
+        `vantax-jury-${timestamp}.csv`,
+        toCsv(
+          filteredJury.map((row) => ({
+            ...row,
+            domainExpertise: formatStoredValue(row.domainExpertise),
+            createdAt: formatDateTime(row.createdAt),
+          })),
+          juryColumns,
+        ),
+      );
+    }
   }
 
   return (
@@ -582,7 +712,7 @@ export default function AdminPage() {
                     <Button variant="outline" onClick={downloadSnapshot} disabled={!data}>
                       <span className="inline-flex items-center gap-2">
                         <Download size={16} />
-                        Download JSON
+                        Export CSV
                       </span>
                     </Button>
                   </div>
@@ -631,6 +761,10 @@ export default function AdminPage() {
                     <span className="inline-flex items-center gap-2">
                       <Activity size={14} className="text-gold-400" />
                       {recentOverall} new registration{recentOverall === 1 ? '' : 's'} in the last 24h
+                    </span>
+                    <span className="inline-flex items-center gap-2">
+                      <Download size={14} className="text-gold-400" />
+                      {activePanel === 'overview' ? 'Overview exports 3 CSV files' : 'Exports the filtered active tab as CSV'}
                     </span>
                   </div>
                 </Card>
