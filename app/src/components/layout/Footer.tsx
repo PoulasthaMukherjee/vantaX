@@ -12,7 +12,16 @@ export default function Footer() {
         </div>
         <p className="text-text-muted text-[16px]">
           <span className="text-purple-500">{'// '}</span>
-          vantax@2026 &middot; powered by vantahire &middot; Bangalore, India &middot; &copy; {new Date().getFullYear()}
+          vantax@2026 &middot; powered by{' '}
+          <a
+            href="https://vantahire.com/"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-gold-500 transition-colors"
+          >
+            vantahire
+          </a>{' '}
+          &middot; Bangalore, India &middot; &copy; {new Date().getFullYear()}
         </p>
       </div>
     </footer>

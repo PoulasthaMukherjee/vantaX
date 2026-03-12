@@ -10,6 +10,9 @@ import { INTEGRITY_ITEMS, SCORING_DETAILS } from '../../lib/constants';
 const iconMap: Record<string, LucideIcon> = { KeyRound, ScanSearch, MessageSquareText, Shuffle, UserCheck };
 
 export default function Integrity() {
+  const topRowItems = INTEGRITY_ITEMS.slice(0, 3);
+  const bottomRowItems = INTEGRITY_ITEMS.slice(3);
+
   return (
     <section className="py-20 px-4 max-w-[1000px] mx-auto">
       <SectionHeader
@@ -18,11 +21,28 @@ export default function Integrity() {
         lead="Every submission is evaluated with multi-layer checks — so results are credible, comparable, and fair."
       />
 
-      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-px mb-12">
-        {INTEGRITY_ITEMS.map((item) => {
+      <StaggerContainer className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-4">
+        {topRowItems.map((item) => {
           const Icon = iconMap[item.icon] || Circle;
           return (
-            <StaggerItem key={item.title}>
+            <StaggerItem key={item.title} className="h-full">
+              <Card className="h-full">
+                <div className="w-8 h-8 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-purple-400" />
+                </div>
+                <h3 className="text-[16px] font-bold mb-2">{item.title}</h3>
+                <p className="text-[16px] text-text-secondary leading-relaxed">{item.description}</p>
+              </Card>
+            </StaggerItem>
+          );
+        })}
+      </StaggerContainer>
+
+      <StaggerContainer className="grid grid-cols-1 gap-4 md:grid-cols-2 md:max-w-[668px] md:mx-auto mb-12">
+        {bottomRowItems.map((item) => {
+          const Icon = iconMap[item.icon] || Circle;
+          return (
+            <StaggerItem key={item.title} className="h-full">
               <Card className="h-full">
                 <div className="w-8 h-8 flex items-center justify-center mb-4">
                   <Icon size={20} className="text-purple-400" />

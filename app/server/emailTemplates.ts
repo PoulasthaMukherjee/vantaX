@@ -4,22 +4,36 @@ const baseStyles = `
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #0D0D1A; color: #fff; margin: 0; padding: 0; }
   .container { max-width: 600px; margin: 0 auto; padding: 40px 24px; }
   .header { text-align: center; margin-bottom: 32px; }
+  .brand-mark { margin-bottom: 16px; font-size: 28px; font-weight: 700; letter-spacing: 0.02em; }
+  .brand-shell { color: #A78BFA; text-decoration: none; }
+  .brand-cursor { background: #FBBF24; width: 0.55em; height: 0.9em; margin-left: 6px; display: inline-block; vertical-align: -0.08em; animation: blink 1s step-end infinite; }
   .header h1 { color: #A78BFA; font-size: 24px; margin: 0; }
   .header p { color: #71717A; font-size: 14px; margin-top: 4px; }
   .card { background: #141428; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
   .label { color: #71717A; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
   .value { color: #fff; font-size: 15px; margin-bottom: 12px; }
   .footer { text-align: center; color: #71717A; font-size: 13px; margin-top: 32px; }
+  .footer a { color: #A78BFA; text-decoration: none; }
   .accent { color: #FBBF24; }
   .primary { color: #A78BFA; }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 `;
 
 function wrap(title: string, subtitle: string, body: string): string {
   return `<!DOCTYPE html><html><head><style>${baseStyles}</style></head><body>
 <div class="container">
-  <div class="header"><h1>${title}</h1><p>${subtitle}</p></div>
+  <div class="header">
+    <div class="brand-mark">
+      <a class="brand-shell" href="https://vantax.vantahire.com/">~/vantax</a><span class="brand-cursor"></span>
+    </div>
+    <h1>${title}</h1>
+    <p>${subtitle}</p>
+  </div>
   ${body}
-  <div class="footer">VantaHire &middot; Human decisions, AI acceleration.<br/>Bangalore, India &middot; hello@vantahire.com</div>
+  <div class="footer"><a href="https://vantahire.com">VantaHire</a> &middot; Human decisions, AI acceleration.<br/><a href="https://vantahire.com">vantahire.com</a> &middot; Bangalore, India &middot; hello@vantahire.com</div>
 </div></body></html>`;
 }
 

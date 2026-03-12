@@ -30,6 +30,11 @@ export default function Navbar() {
       <div className="max-w-[1000px] mx-auto px-4 sm:px-8 flex items-center justify-between h-14">
         <Link to="/" className="flex items-center gap-2 group text-purple-500 text-lg font-medium">
           <span>~/vantax</span>
+          <span
+            className="inline-block h-[0.9em] w-[0.55em] bg-gold-500 animate-blink align-middle"
+            aria-hidden="true"
+          >
+          </span>
         </Link>
 
         {/* Desktop */}

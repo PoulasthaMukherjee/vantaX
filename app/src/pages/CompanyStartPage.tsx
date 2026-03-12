@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import FormField from '../components/form/FormField';
+import SelectField from '../components/form/SelectField';
 import FormSection from '../components/form/FormSection';
 import CheckboxGroup from '../components/form/CheckboxGroup';
 import SubmitButton from '../components/form/SubmitButton';
@@ -184,26 +185,28 @@ export default function CompanyStartPage() {
                 <FormSection title="Step 3: Company Context" description="Share enough context for VantaX to draft the hiring audition.">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormField label="Company Website" required value={context.websiteUrl} onChange={setContextField('websiteUrl')} placeholder="https://..." />
-                    <div>
-                      <label className="block text-[13px] font-medium mb-1.5">Company Size <span className="text-gold-500 ml-1">*</span></label>
-                      <select value={context.companySize} onChange={setContextField('companySize')} className="w-full bg-bg border border-border px-4 py-3 text-[13px] text-text-primary outline-none transition-colors focus:border-purple-500 focus:bg-purple-500/5">
-                        <option value="">Select company size</option>
-                        {COMPANY_SIZE_OPTIONS.map((option) => (
-                          <option key={option} value={option}>{option}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <SelectField
+                      label="Company Size"
+                      required
+                      value={context.companySize}
+                      onChange={setContextField('companySize')}
+                      options={[
+                        { value: '', label: 'Select company size' },
+                        ...COMPANY_SIZE_OPTIONS.map((option) => ({ value: option, label: option })),
+                      ]}
+                    />
                   </div>
 
-                  <div>
-                    <label className="block text-[13px] font-medium mb-1.5">Industry <span className="text-gold-500 ml-1">*</span></label>
-                    <select value={context.industry} onChange={setContextField('industry')} className="w-full bg-bg border border-border px-4 py-3 text-[13px] text-text-primary outline-none transition-colors focus:border-purple-500 focus:bg-purple-500/5">
-                      <option value="">Select industry</option>
-                      {INDUSTRY_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <SelectField
+                    label="Industry"
+                    required
+                    value={context.industry}
+                    onChange={setContextField('industry')}
+                    options={[
+                      { value: '', label: 'Select industry' },
+                      ...INDUSTRY_OPTIONS.map((option) => ({ value: option, label: option })),
+                    ]}
+                  />
 
                   <CheckboxGroup label="Roles Hiring For" options={ROLE_OPTIONS} selected={rolesHiringFor} onChange={setRolesHiringFor} required />
 

@@ -9,12 +9,27 @@ export default function PoweredByVantaHire() {
         <div className="bg-card border border-border p-8 sm:p-12 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-purple-500 text-[16px]">{'// '}</span>
-            <span className="text-xl font-bold text-purple-400">Powered by VantaHire</span>
+            <a
+              href="https://vantahire.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xl font-bold text-purple-400 hover:text-gold-500 transition-colors"
+            >
+              Powered by VantaHire
+            </a>
           </div>
 
           <p className="text-text-secondary text-[16px] leading-relaxed max-w-xl mx-auto mb-8">
-            VantaHire is building the infrastructure for skills-first talent discovery in India.
-            VantaX is our first execution-scored assessment — designed to create a verified, performance-ranked
+            <a
+              href="https://vantahire.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-purple-400 hover:text-gold-500 transition-colors"
+            >
+              VantaHire
+            </a>{' '}
+            is building the infrastructure for skills-first talent discovery in India. VantaX is our
+            first execution-scored assessment — designed to create a verified, performance-ranked
             early-career talent pool connected directly to companies ready to hire.
           </p>
 
