@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { ensureDatabaseSchema } from './db';
+import { injectMeta } from './routeMeta';
 import adminRouter from './routes/admin';
 import candidatesRouter from './routes/candidates';
 import companiesRouter from './routes/companies';
@@ -42,10 +43,36 @@ function isKnownRoute(url: string): boolean {
 
 app.use(compression());
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://sdk.cashfree.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      fontSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://sdk.cashfree.com", "https://api.cashfree.com"],
+      frameSrc: ["https://sdk.cashfree.com"],
+    },
+  },
   crossOriginEmbedderPolicy: false,
 }));
 app.use(cors());
+
+// Permissions-Policy: restrict unused browser features
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+// Trailing slash redirect → canonical URL without slash
+app.use((req, res, next) => {
+  if (req.path !== '/' && req.path.endsWith('/')) {
+    const clean = req.path.slice(0, -1);
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, clean + query);
+  }
+  next();
+});
 // Capture raw body for webhook signature verification
 app.use(express.json({
   verify: (req: any, _res, buf) => {
@@ -69,6 +96,9 @@ app.all('/api/*', (_req, res) => res.status(404).json({ error: 'Not found' }));
 // Serve Vite build in production
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
+  // Read index.html once at startup for meta injection
+  const indexHtml = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+
   // Hashed assets get long-lived cache
   app.use('/assets', express.static(path.join(distPath, 'assets'), {
     maxAge: '1y',
@@ -77,10 +107,11 @@ if (fs.existsSync(distPath)) {
   // Other static files get short cache
   app.use(express.static(distPath, { maxAge: '1h' }));
 
-  // SPA fallback with proper 404 status for unknown routes
+  // SPA fallback with per-page meta injection for social crawlers & SEO
   app.get('*', (req, res) => {
     const status = isKnownRoute(req.path) ? 200 : 404;
-    res.status(status).sendFile(path.join(distPath, 'index.html'));
+    const html = injectMeta(indexHtml, req.path);
+    res.status(status).type('html').send(html);
   });
 }
 

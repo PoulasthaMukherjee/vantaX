@@ -23,10 +23,11 @@ export default function CTA() {
           <p className="text-gold-500 text-[16px] font-bold mb-8">
             ₹199 + GST · All 3 Challenges
           </p>
-          <a href="#register">
-            <button className="px-8 py-3.5 bg-gold-500 text-bg font-bold text-[16px] uppercase tracking-wider hover:bg-gold-400 hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] transition-all">
-              vantax --register --now
-            </button>
+          <a
+            href="#register"
+            className="px-8 py-3.5 bg-gold-500 text-bg font-bold text-[16px] uppercase tracking-wider hover:bg-gold-400 hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] transition-all inline-block"
+          >
+            vantax --register --now
           </a>
         </div>
       </motion.div>

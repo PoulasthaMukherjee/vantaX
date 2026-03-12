@@ -74,7 +74,7 @@ export default function HowItWorks() {
             <Card className="h-full">
               <div className="text-2xl font-bold text-purple-500/20 mb-3">{item.step}</div>
               <h3 className="text-[16px] font-bold">{item.title}</h3>
-              <p className="text-[13px] text-text-secondary leading-relaxed">{item.description}</p>
+              <p className="text-[16px] text-text-secondary leading-relaxed">{item.description}</p>
             </Card>
           </StaggerItem>
         ))}
@@ -83,21 +83,21 @@ export default function HowItWorks() {
       <div className="mt-10 grid gap-4 md:grid-cols-3">
         {rounds.map((round) => (
           <Card key={round.round} className="h-full">
-            <p className="text-[12px] font-bold uppercase tracking-widest text-gold-500">{round.round}</p>
+            <p className="text-[14px] font-bold uppercase tracking-widest text-gold-500">{round.round}</p>
             <h3 className="mt-2 text-[16px] font-bold">{round.title}</h3>
-            <p className="mt-3 text-[13px] text-text-secondary leading-relaxed">{round.description}</p>
-            <p className="mt-3 text-[12px] text-text-muted italic">{round.example}</p>
+            <p className="mt-3 text-[16px] text-text-secondary leading-relaxed">{round.description}</p>
+            <p className="mt-3 text-[14px] text-text-muted italic">{round.example}</p>
           </Card>
         ))}
       </div>
 
       <div className="mt-10 grid gap-4 lg:grid-cols-2">
         <Card>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-gold-500">Your Involvement</p>
+          <p className="text-[14px] font-bold uppercase tracking-widest text-gold-500">Your Involvement</p>
           <h3 className="mt-2 text-lg font-bold">Minimal effort from your side.</h3>
           <ul className="mt-5 space-y-3">
             {companyInputs.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-[13px] text-text-secondary">
+              <li key={item} className="flex items-start gap-3 text-[16px] text-text-secondary">
                 <span className="mt-0.5 text-success">✔</span>
                 <span>{item}</span>
               </li>
@@ -106,11 +106,11 @@ export default function HowItWorks() {
         </Card>
 
         <Card>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-purple-400">VantaX Handles</p>
+          <p className="text-[14px] font-bold uppercase tracking-widest text-purple-400">VantaX Handles</p>
           <h3 className="mt-2 text-lg font-bold">We run the audition for you.</h3>
           <ul className="mt-5 space-y-3">
             {vantaxHandles.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-[13px] text-text-secondary">
+              <li key={item} className="flex items-start gap-3 text-[16px] text-text-secondary">
                 <span className="mt-0.5 text-gold-500">•</span>
                 <span>{item}</span>
               </li>

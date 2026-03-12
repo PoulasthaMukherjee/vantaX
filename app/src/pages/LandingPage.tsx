@@ -13,7 +13,7 @@ export default function LandingPage() {
   return (
     <>
       <SEO
-        title="VantaX 2026 — 3 Challenges. 2 Hours Each. | India's Hiring Audition"
+        title="VantaX 2026 — 3 Challenges. 2 Hours Each. | Hiring Audition"
         description="India's first structured hiring audition. 3 challenges, 2 hours each. Real companies post real problems. You solve them. Top performers are introduced to partner companies. Starts April 2026."
         path="/"
         breadcrumbs={[{ name: 'Home', path: '/' }]}

@@ -22,9 +22,9 @@
   --color-text-primary: #e4e4e7;
   --color-text-secondary: #e4e4e7;
   --color-text-muted: #d4d4d8;
-  --font-display: "JetBrains Mono", "Space Mono", monospace;
-  --font-mono: "JetBrains Mono", "Space Mono", monospace;
-  --font-sans: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "JetBrains Mono", "JetBrains Mono Fallback", monospace;
+  --font-mono: "JetBrains Mono", "JetBrains Mono Fallback", monospace;
+  --font-sans: "Inter", "Inter Fallback", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {

@@ -18,7 +18,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 export default function App() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="min-h-screen bg-bg flex items-center justify-center"><span className="text-purple-500 text-[16px] animate-pulse">loading...</span></div>}>
       <Routes>
         <Route element={<PageLayout />}>
           <Route path="/" element={<LandingPage />} />

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import FadeInOnScroll from '../../components/motion/FadeInOnScroll';
-import Button from '../../components/ui/Button';
 
 export default function StartAuditionCTA() {
   return (
@@ -17,8 +16,11 @@ export default function StartAuditionCTA() {
             VantaX turns your company context into an AI-assisted hiring audition draft. You edit it,
             approve it, and submit it for review.
           </p>
-          <Link to="/companies/start">
-            <Button className="animate-glow-pulse">Run a Hiring Audition</Button>
+          <Link
+            to="/companies/start"
+            className="px-6 py-3 font-bold text-[16px] uppercase tracking-wider transition-all bg-gold-500 text-bg hover:bg-gold-400 hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] animate-glow-pulse inline-block"
+          >
+            Run a Hiring Audition
           </Link>
         </div>
       </FadeInOnScroll>

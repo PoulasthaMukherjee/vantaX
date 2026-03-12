@@ -5,15 +5,15 @@ export default function Footer() {
     <footer className="border-t border-border py-8 px-4 text-center">
       <div className="max-w-[1000px] mx-auto">
         <div className="flex flex-wrap items-center justify-center gap-6 mb-4 text-[16px] text-text-muted">
-          <Link to="/what-is-vantax" className="hover:text-gold-500 transition-colors py-1">--what-is-vantax</Link>
-          <Link to="/companies" className="hover:text-gold-500 transition-colors py-1">--companies</Link>
-          <Link to="/jury" className="hover:text-gold-500 transition-colors py-1">--join-as-jury</Link>
-          <a href="mailto:hello@vantahire.com" className="hover:text-gold-500 transition-colors py-1">hello@vantahire.com</a>
+          <Link to="/what-is-vantax" className="hover:text-gold-500 transition-colors py-2">--what-is-vantax</Link>
+          <Link to="/companies" className="hover:text-gold-500 transition-colors py-2">--companies</Link>
+          <Link to="/jury" className="hover:text-gold-500 transition-colors py-2">--join-as-jury</Link>
+          <a href="mailto:hello@vantahire.com" className="hover:text-gold-500 transition-colors py-2">hello@vantahire.com</a>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-6 mb-4 text-[14px] text-text-muted/60">
-          <Link to="/privacy" className="hover:text-gold-500 transition-colors py-1">Privacy</Link>
-          <Link to="/terms" className="hover:text-gold-500 transition-colors py-1">Terms</Link>
-          <Link to="/refund" className="hover:text-gold-500 transition-colors py-1">Refunds</Link>
+          <Link to="/privacy" className="hover:text-gold-500 transition-colors py-2">Privacy</Link>
+          <Link to="/terms" className="hover:text-gold-500 transition-colors py-2">Terms</Link>
+          <Link to="/refund" className="hover:text-gold-500 transition-colors py-2">Refunds</Link>
         </div>
         <p className="text-text-muted text-[16px]">
           <span className="text-purple-500">{'// '}</span>

@@ -10,5 +10,6 @@ public/uploads/*
 !app/public/brand/apple-touch-icon.png
 !app/public/hero-image.png
 !app/public/hero-image.webp
+!app/public/hero-image.avif
 .claude/
 0[1-6]_VantaX_*

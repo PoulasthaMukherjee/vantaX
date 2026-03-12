@@ -30,8 +30,8 @@ export default function ProblemTypes() {
         <div className="grid gap-4 md:grid-cols-3">
           {examples.map((example) => (
             <Card key={example.label} className="h-full">
-              <p className="text-[12px] font-bold uppercase tracking-widest text-gold-500">{example.label}</p>
-              <p className="mt-3 text-[14px] text-text-primary leading-relaxed">{example.problem}</p>
+              <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">{example.label}</p>
+              <p className="mt-3 text-[16px] text-text-primary leading-relaxed">{example.problem}</p>
             </Card>
           ))}
         </div>

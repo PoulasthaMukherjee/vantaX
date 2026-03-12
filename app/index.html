@@ -5,18 +5,23 @@
     <link rel="icon" type="image/png" href="/brand/favicon-32.png" sizes="64x64" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VantaX 2026 — 3 Challenges. 2 Hours Each. | India's Hiring Audition</title>
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>VantaX 2026 — 3 Challenges. 2 Hours Each. | Hiring Audition</title>
     <meta name="description" content="India's first structured hiring audition. 3 challenges, 2 hours each. Real companies post real problems. You solve them. Top performers are introduced to partner companies. Starts April 2026." />
     <meta name="keywords" content="VantaX, hiring audition, skills-based hiring, campus placement alternative, coding challenge, AI tools, VantaHire, entry-level jobs India, online assessment platform" />
     <meta name="author" content="VantaHire" />
 
-    <!-- Preload LCP hero image -->
-    <link rel="preload" as="image" type="image/webp" href="/hero-image.webp" fetchpriority="high" />
+    <!-- Preload LCP hero image (AVIF with WebP fallback) -->
+    <link rel="preload" as="image" type="image/avif" href="/hero-image.avif" fetchpriority="high" />
+
+    <!-- Self-hosted fonts — eliminates DNS/TLS overhead to fonts.googleapis.com -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/jetbrains-mono.woff2" crossorigin />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="VantaX by VantaHire" />
-    <meta property="og:title" content="VantaX 2026 — 3 Challenges. 2 Hours Each." />
+    <meta property="og:title" content="VantaX 2026 — 3 Challenges. 2 Hours Each. | Hiring Audition" />
     <meta property="og:description" content="India's first structured hiring audition. Real companies post real problems. You solve them. Top performers are introduced to partner companies. AI tools encouraged." />
     <meta property="og:url" content="https://vantax.vantahire.com/" />
     <meta property="og:image" content="https://vantax.vantahire.com/brand/vantax-logo.png" />
@@ -26,7 +31,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="VantaX 2026 — 3 Challenges. 2 Hours Each." />
+    <meta name="twitter:title" content="VantaX 2026 — 3 Challenges. 2 Hours Each. | Hiring Audition" />
     <meta name="twitter:description" content="India's first structured hiring audition. Real companies post real problems. You solve them. Top performers are introduced to partner companies." />
     <meta name="twitter:image" content="https://vantax.vantahire.com/brand/vantax-logo.png" />
 
@@ -116,40 +121,63 @@
     }
     </script>
 
-    <!-- Structured Data: SoftwareApplication -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "VantaX",
-      "description": "India's first structured hiring audition platform. Real companies post real engineering problems. Candidates solve them individually in timed, AI-augmented sessions. Top performers are introduced to partner companies.",
-      "url": "https://vantax.vantahire.com",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Web",
-      "offers": {
-        "@type": "Offer",
-        "price": "199",
-        "priceCurrency": "INR"
-      },
-      "author": {
-        "@type": "Organization",
-        "@id": "https://vantahire.com/#organization",
-        "name": "VantaHire",
-        "url": "https://vantahire.com"
+    <!-- Self-hosted @font-face declarations with size-adjust fallbacks -->
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url(/fonts/inter-latin-ext.woff2) format('woff2');
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
       }
-    }
-    </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-    </noscript>
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url(/fonts/inter-latin.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono';
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url(/fonts/jetbrains-mono.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      /* Size-adjust fallback to reduce CLS on font swap */
+      @font-face {
+        font-family: 'Inter Fallback';
+        src: local('Arial');
+        size-adjust: 107%;
+        ascent-override: 90%;
+        descent-override: 22%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'JetBrains Mono Fallback';
+        src: local('Courier New');
+        size-adjust: 95%;
+        ascent-override: 100%;
+        descent-override: 20%;
+        line-gap-override: 0%;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="max-width:700px;margin:80px auto;padding:0 20px;font-family:system-ui,sans-serif;color:#e0e0e0;background:#0d0d1a">
+        <h1>VantaX 2026 — India's Structured Hiring Audition</h1>
+        <p>3 challenges. 2 hours each. Real companies post real problems. You solve them individually. AI tools encouraged. Top performers are introduced to partner companies.</p>
+        <p><strong>How it works:</strong> Candidates solve 3 timed challenges across one week. Each is individually evaluated using AI pre-scoring and human moderation on a standardized rubric. Top performers get shortlisted for internship and entry-level interviews.</p>
+        <p>Registration: &#x20B9;199 + GST &middot; Event: April 25&ndash;29, 2026</p>
+        <p><a href="https://vantax.vantahire.com/" style="color:#a78bfa">Visit VantaX</a> &middot; <a href="https://vantax.vantahire.com/companies" style="color:#a78bfa">For Companies</a> &middot; <a href="https://vantax.vantahire.com/jury" style="color:#a78bfa">Join the Jury</a></p>
+        <p style="margin-top:40px;font-size:14px;color:#888">VantaX is a product of <a href="https://vantahire.com" style="color:#a78bfa">VantaHire</a> (Airevolabs LLP, Bangalore).</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

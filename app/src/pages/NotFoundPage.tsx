@@ -8,6 +8,7 @@ export default function NotFoundPage() {
         title="Page Not Found | VantaX 2026"
         description="The page you're looking for doesn't exist."
         path="/404"
+        noindex
       />
       <section className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
         <p className="text-[16px] text-text-muted mb-4">

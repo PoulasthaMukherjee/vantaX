@@ -27,7 +27,7 @@ export default function RadioGroup({ label, options, value, onChange, required }
           return (
             <label
               key={optValue}
-              className={`flex items-start gap-3 px-4 py-2.5 border cursor-pointer transition-colors text-[16px] ${
+              className={`flex items-start gap-3 px-4 py-3 border cursor-pointer transition-colors text-[16px] ${
                 selected
                   ? 'border-gold-500/50 bg-gold-500/5 text-text-primary'
                   : 'border-border bg-bg text-text-muted hover:border-border-hover'

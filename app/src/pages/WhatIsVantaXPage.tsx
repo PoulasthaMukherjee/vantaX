@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import SEO from '../components/SEO';
 import SectionHeader from '../components/ui/SectionHeader';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+
 import StaggerContainer from '../components/motion/StaggerContainer';
 import StaggerItem from '../components/motion/StaggerItem';
 import FadeInOnScroll from '../components/motion/FadeInOnScroll';
@@ -40,9 +40,9 @@ export default function WhatIsVantaXPage() {
         <div className="absolute top-[20%] left-[-20%] w-[60%] h-[60%] bg-[radial-gradient(ellipse,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 max-w-3xl"
         >
           <p className="text-[16px] font-bold uppercase tracking-wider text-purple-400 mb-6">
@@ -55,23 +55,14 @@ export default function WhatIsVantaXPage() {
             Built to Replace Resume Filtering
           </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="text-[16px] text-text-muted max-w-2xl mx-auto leading-relaxed"
-        >
-          VantaX replaces the broken resume-to-interview pipeline. Real companies post real problems.
-          You solve them individually — 3 challenges, 2 hours each, AI tools encouraged.
-          </motion.p>
-
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-4 text-[16px] font-bold text-gold-500"
+            transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[16px] text-text-muted max-w-2xl mx-auto leading-relaxed"
           >
-            Your college brand won't matter here. Your execution will.
+            Real companies post real problems. You solve them individually — 3 challenges, 2 hours each, AI tools encouraged.
+            Your college brand won't matter here. <span className="text-gold-500 font-bold">Your execution will.</span>
           </motion.p>
         </motion.div>
       </section>
@@ -199,8 +190,11 @@ export default function WhatIsVantaXPage() {
             <p className="text-[16px] font-bold text-gold-500 mb-8">
               Top performers get introduced directly to partner companies.
             </p>
-            <a href="/#register">
-              <Button>Apply for VantaX 2026</Button>
+            <a
+              href="/#register"
+              className="px-6 py-3 font-bold text-[16px] uppercase tracking-wider transition-all bg-gold-500 text-bg hover:bg-gold-400 hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] inline-block"
+            >
+              Apply for VantaX 2026
             </a>
           </div>
         </FadeInOnScroll>

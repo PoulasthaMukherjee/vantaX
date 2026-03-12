@@ -21,7 +21,7 @@ export default function CheckboxGroup({ label, options, selected, onChange, requ
         {options.map((opt) => (
           <label
             key={opt}
-            className={`flex items-center gap-3 px-4 py-2.5 border cursor-pointer transition-colors text-[16px] ${
+            className={`flex items-center gap-3 px-4 py-3 border cursor-pointer transition-colors text-[16px] ${
               selected.includes(opt)
                 ? 'border-gold-500/50 bg-gold-500/5 text-text-primary'
                 : 'border-border bg-bg text-text-muted hover:border-border-hover'
