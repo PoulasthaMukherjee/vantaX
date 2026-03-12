@@ -366,7 +366,7 @@ router.post('/:id/submit', async (req, res) => {
       websiteUrl: row.websiteUrl,
       industry: row.industry || null,
       companySize: row.companySize || null,
-      companyStage: row.companySize || null,
+      companyStage: null,
       rolesHiringFor: row.rolesHiringFor,
       contactName: row.contactName,
       contactRole: finalRoundAttendeeRole || null,

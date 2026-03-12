@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import type { AssessmentDraft as AssessmentDocument, CompanyFlowDraft } from '../lib/api';
 import {
   Activity,
   Building2,
@@ -20,7 +21,7 @@ import SectionHeader from '../components/ui/SectionHeader';
 
 const STORAGE_KEY = 'vantax_admin_api_key';
 
-type PanelKey = 'overview' | 'candidates' | 'companies' | 'jury';
+type PanelKey = 'overview' | 'candidates' | 'companies' | 'assessments' | 'jury';
 
 interface Candidate {
   id: number;
@@ -84,19 +85,68 @@ interface RegistrationResponse {
   counts: {
     candidates: number;
     companies: number;
+    assessmentDrafts: number;
     juryMembers: number;
   };
   candidates: Candidate[];
   companies: Company[];
+  assessmentDrafts: CompanyFlowDraft[];
   juryMembers: JuryMember[];
 }
 
 interface ActivityItem {
   id: string;
-  type: 'Candidate' | 'Company' | 'Jury';
+  type: 'Candidate' | 'Company' | 'Assessment' | 'Jury';
   name: string;
   detail: string;
   createdAt: string | null;
+}
+
+interface AssessmentExportRow {
+  id: number;
+  status: string;
+  companyName: string;
+  contactName: string;
+  workEmail: string;
+  websiteUrl: string;
+  industry: string;
+  companySize: string;
+  rolesHiringFor: string;
+  skillsToEvaluate: string;
+  problemContext: string;
+  problemTitle: string;
+  problemSummary: string;
+  candidatePrompt: string;
+  round1Task: string;
+  round2Task: string;
+  round3Task: string;
+  evaluationCriteria: string;
+  deliverables: string;
+  constraints: string;
+  reviewNotes: string;
+  submittedAt: string;
+  updatedAt: string;
+}
+
+function getAssessmentRecordDraft(row: CompanyFlowDraft) {
+  return row.editedDraft ?? row.generatedDraft;
+}
+
+function getAssessmentTitle(row: CompanyFlowDraft) {
+  const draft = getAssessmentRecordDraft(row);
+  return draft?.problemStatement.title || 'Draft in progress';
+}
+
+function formatArrayValue(values: string[]) {
+  return values.length > 0 ? values.join(', ') : 'Not provided';
+}
+
+function renderPlainBlock(value: string) {
+  return value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join('\n');
 }
 
 function formatDateTime(value: string | null) {
@@ -177,12 +227,12 @@ function escapeCsvCell(value: string | number | null | undefined) {
   return `"${escaped}"`;
 }
 
-function toCsv<Row extends Record<string, unknown>>(rows: Row[], columns: Array<{ key: keyof Row; label: string }>) {
+function toCsv<Row extends object>(rows: Row[], columns: Array<{ key: keyof Row; label: string }>) {
   const header = columns.map((column) => escapeCsvCell(column.label)).join(',');
   const body = rows.map((row) =>
     columns
       .map((column) => {
-        const rawValue = row[column.key];
+        const rawValue = (row as Record<string, unknown>)[String(column.key)];
         const normalized =
           typeof rawValue === 'string' || typeof rawValue === 'number'
             ? rawValue
@@ -227,6 +277,30 @@ function buildActivityFeed(data: RegistrationResponse | null, query: string) {
       name: row.companyName,
       detail: row.problemTitle,
       createdAt: row.createdAt,
+    });
+  }
+
+  for (const row of data.assessmentDrafts) {
+    const draft = getAssessmentRecordDraft(row);
+    if (
+      !includesQuery(query, [
+        row.companyName,
+        row.contactName,
+        row.workEmail,
+        row.problemContext,
+        row.techStack,
+        row.finalRoundAttendeeName,
+        draft?.problemStatement.title,
+      ])
+    ) {
+      continue;
+    }
+    items.push({
+      id: `assessment-${row.id}`,
+      type: 'Assessment',
+      name: row.companyName,
+      detail: getAssessmentTitle(row),
+      createdAt: row.submittedAt ?? row.updatedAt ?? row.createdAt,
     });
   }
 
@@ -411,6 +485,22 @@ export default function AdminPage() {
       )
     : [];
 
+  const filteredAssessments = data
+    ? data.assessmentDrafts.filter((row) => {
+        const draft = getAssessmentRecordDraft(row);
+        return includesQuery(deferredQuery, [
+          row.companyName,
+          row.contactName,
+          row.workEmail,
+          row.problemContext,
+          row.techStack,
+          row.finalRoundAttendeeName,
+          draft?.problemStatement.title,
+          draft?.problemStatement.summary,
+        ]);
+      })
+    : [];
+
   const filteredJury = data
     ? data.juryMembers.filter((row) =>
         includesQuery(deferredQuery, [
@@ -426,9 +516,21 @@ export default function AdminPage() {
 
   const activityFeed = buildActivityFeed(data, deferredQuery);
   const latestItem = activityFeed[0] ?? null;
-  const totalVisible = filteredCandidates.length + filteredCompanies.length + filteredJury.length;
-  const totalOverall = data ? data.counts.candidates + data.counts.companies + data.counts.juryMembers : 0;
-  const recentOverall = data ? countRecent([...data.candidates, ...data.companies, ...data.juryMembers], 24) : 0;
+  const totalVisible = filteredCandidates.length + filteredCompanies.length + filteredAssessments.length + filteredJury.length;
+  const totalOverall = data
+    ? data.counts.candidates + data.counts.companies + data.counts.assessmentDrafts + data.counts.juryMembers
+    : 0;
+  const recentOverall = data
+    ? countRecent(
+        [
+          ...data.candidates,
+          ...data.companies,
+          ...data.assessmentDrafts.map((row) => ({ createdAt: row.updatedAt ?? row.submittedAt ?? row.createdAt })),
+          ...data.juryMembers,
+        ],
+        24,
+      )
+    : 0;
 
   function submitKey() {
     const trimmed = inputKey.trim();
@@ -531,6 +633,32 @@ export default function AdminPage() {
       { key: 'createdAt', label: 'Created At' },
     ];
 
+    const assessmentColumns: Array<{ key: keyof AssessmentExportRow; label: string }> = [
+      { key: 'id', label: 'ID' },
+      { key: 'status', label: 'Status' },
+      { key: 'companyName', label: 'Company Name' },
+      { key: 'contactName', label: 'Contact Name' },
+      { key: 'workEmail', label: 'Work Email' },
+      { key: 'websiteUrl', label: 'Website URL' },
+      { key: 'industry', label: 'Industry' },
+      { key: 'companySize', label: 'Company Size' },
+      { key: 'rolesHiringFor', label: 'Roles Hiring For' },
+      { key: 'skillsToEvaluate', label: 'Skills To Evaluate' },
+      { key: 'problemContext', label: 'Business Context' },
+      { key: 'problemTitle', label: 'Problem Title' },
+      { key: 'problemSummary', label: 'Problem Summary' },
+      { key: 'candidatePrompt', label: 'Candidate Prompt' },
+      { key: 'round1Task', label: 'Round 1 Task' },
+      { key: 'round2Task', label: 'Round 2 Task' },
+      { key: 'round3Task', label: 'Round 3 Task' },
+      { key: 'evaluationCriteria', label: 'Evaluation Criteria' },
+      { key: 'deliverables', label: 'Deliverables' },
+      { key: 'constraints', label: 'Constraints' },
+      { key: 'reviewNotes', label: 'Review Notes' },
+      { key: 'submittedAt', label: 'Submitted At' },
+      { key: 'updatedAt', label: 'Updated At' },
+    ];
+
     if (activePanel === 'overview' || activePanel === 'candidates') {
       downloadFile(
         `vantax-candidates-${timestamp}.csv`,
@@ -558,6 +686,39 @@ export default function AdminPage() {
           companyColumns,
         ),
       );
+    }
+
+    if (activePanel === 'overview' || activePanel === 'assessments') {
+      const assessmentRows: AssessmentExportRow[] = filteredAssessments.map((row) => {
+        const draft = getAssessmentRecordDraft(row);
+        return {
+          id: row.id,
+          status: row.status,
+          companyName: row.companyName,
+          contactName: row.contactName,
+          workEmail: row.workEmail,
+          websiteUrl: row.websiteUrl || '',
+          industry: row.industry || '',
+          companySize: row.companySize || '',
+          rolesHiringFor: formatArrayValue(row.rolesHiringFor),
+          skillsToEvaluate: formatArrayValue(row.skillsToEvaluate),
+          problemContext: row.problemContext || '',
+          problemTitle: draft?.problemStatement.title || '',
+          problemSummary: draft?.problemStatement.summary || '',
+          candidatePrompt: draft?.problemStatement.candidatePrompt || '',
+          round1Task: draft?.round1.task || '',
+          round2Task: draft?.round2.task || '',
+          round3Task: draft?.round3.task || '',
+          evaluationCriteria: formatArrayValue(draft?.evaluationCriteria || []),
+          deliverables: formatArrayValue(draft?.deliverables || []),
+          constraints: formatArrayValue(draft?.constraints || []),
+          reviewNotes: formatArrayValue(draft?.reviewNotes || []),
+          submittedAt: formatDateTime(row.submittedAt),
+          updatedAt: formatDateTime(row.updatedAt),
+        };
+      });
+
+      downloadFile(`vantax-assessments-${timestamp}.csv`, toCsv(assessmentRows, assessmentColumns));
     }
 
     if (activePanel === 'overview' || activePanel === 'jury') {
@@ -591,7 +752,7 @@ export default function AdminPage() {
                 <SectionHeader
                   label="Admin"
                   title="Track registrations in one live command center."
-                  lead="Review intake across candidates, companies, and jury members, filter fast, export snapshots, and watch new submissions land without digging through logs."
+                  lead="Review intake across candidates, companies, assessment drafts, and jury members, filter fast, export snapshots, and watch new submissions land without digging through logs."
                 />
               </div>
             </div>
@@ -657,7 +818,7 @@ export default function AdminPage() {
                   <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Ready when you are</p>
                   <h3 className="mt-2 text-xl font-bold"><span className="text-purple-500">{'$ '}</span>Unlock the intake dashboard to inspect every registration.</h3>
                   <p className="mt-3 max-w-2xl text-[16px] text-text-muted">
-                    Once the key is loaded, this page fetches all candidate, company, and jury records from the live API and keeps the dataset searchable.
+                    Once the key is loaded, this page fetches candidate, company, assessment draft, and jury records from the live API and keeps the dataset searchable.
                   </p>
                 </div>
                 <div className="min-w-[220px] border border-dashed border-purple-500/30 bg-purple-500/5 px-5 py-4">
@@ -670,7 +831,7 @@ export default function AdminPage() {
 
           {(data || loading || activeKey) && (
             <div className="space-y-8">
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                 <MetricCard
                   label="Visible Records"
                   value={String(totalVisible)}
@@ -693,11 +854,18 @@ export default function AdminPage() {
                   icon={<Building2 size={20} />}
                 />
                 <MetricCard
+                  label="Assessments"
+                  value={String(filteredAssessments.length)}
+                  hint={`${data?.counts.assessmentDrafts ?? 0} total, ${countRecent((data?.assessmentDrafts ?? []).map((row) => ({ createdAt: row.updatedAt ?? row.submittedAt ?? row.createdAt })), 24)} updated in the last 24h`}
+                  tone="green"
+                  icon={<FileText size={20} />}
+                />
+                <MetricCard
                   label="Jury"
                   value={String(filteredJury.length)}
                   hint={`${data?.counts.juryMembers ?? 0} total, ${countRecent(data?.juryMembers ?? [], 24)} in the last 24h`}
-                  tone="green"
-                  icon={<FileText size={20} />}
+                  tone="purple"
+                  icon={<ShieldCheck size={20} />}
                 />
               </div>
 
@@ -734,6 +902,7 @@ export default function AdminPage() {
                         ['overview', 'Overview'],
                         ['candidates', 'Candidates'],
                         ['companies', 'Companies'],
+                        ['assessments', 'Assessments'],
                         ['jury', 'Jury'],
                       ] as Array<[PanelKey, string]>).map(([value, label]) => (
                         <button
@@ -763,7 +932,7 @@ export default function AdminPage() {
                     </span>
                     <span className="inline-flex items-center gap-2">
                       <Download size={14} className="text-gold-500" />
-                      {activePanel === 'overview' ? 'Overview exports 3 CSV files' : 'Exports the filtered active tab as CSV'}
+                      {activePanel === 'overview' ? 'Overview exports 4 CSV files' : 'Exports the filtered active tab as CSV'}
                     </span>
                   </div>
                 </div>
@@ -995,6 +1164,156 @@ export default function AdminPage() {
                         </table>
                       </div>
                     </>
+                  )}
+                </div>
+              )}
+
+              {activePanel === 'assessments' && (
+                <div className="bg-card border border-border p-5 sm:p-6">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500"><span className="text-purple-500">{'// '}</span>Assessment Drafts</p>
+                      <h3 className="mt-2 text-xl font-bold">Full assessment context from the company flow</h3>
+                      <p className="mt-2 text-[16px] text-text-muted">
+                        Review the business context, generated assessment, edited version, and submission metadata without losing round-level detail.
+                      </p>
+                    </div>
+                    <div className="border border-border bg-bg px-4 py-3 text-right">
+                      <p className="text-[16px] font-bold uppercase tracking-widest text-text-muted">Showing</p>
+                      <p className="mt-1 text-2xl font-bold text-gold-500">{filteredAssessments.length}</p>
+                      <p className="text-[16px] text-text-muted">of {data?.counts.assessmentDrafts ?? 0} assessments</p>
+                    </div>
+                  </div>
+
+                  {filteredAssessments.length === 0 ? (
+                    <div className="mt-5">
+                      <EmptySection message="No assessment drafts match the current filters." />
+                    </div>
+                  ) : (
+                    <div className="mt-5 space-y-5">
+                      {filteredAssessments.map((row) => {
+                        const draft = getAssessmentRecordDraft(row);
+                        const rounds: Array<[string, AssessmentDocument['round1'] | undefined]> = [
+                          ['Round 1', draft?.round1],
+                          ['Round 2', draft?.round2],
+                          ['Round 3', draft?.round3],
+                        ];
+
+                        return (
+                          <article key={row.id} className="border border-border bg-bg p-5 terminal-border-left">
+                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                              <div>
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">{row.status.replace(/_/g, ' ')}</p>
+                                  {row.submittedAt && <p className="text-[16px] text-text-muted">Submitted {formatDateTime(row.submittedAt)}</p>}
+                                </div>
+                                <h4 className="mt-2 text-xl font-bold text-text-primary">{row.companyName}</h4>
+                                <p className="mt-1 text-[16px] text-text-muted">
+                                  {row.contactName} • {row.workEmail}
+                                </p>
+                                <p className="mt-2 text-[16px] text-text-secondary">{getAssessmentTitle(row)}</p>
+                              </div>
+                              <div className="min-w-[240px] border border-border px-4 py-3 text-[16px] text-text-muted">
+                                <p>Website: {row.websiteUrl || 'Not provided'}</p>
+                                <p className="mt-1">Industry: {row.industry || 'Not provided'}</p>
+                                <p className="mt-1">Size: {row.companySize || 'Not provided'}</p>
+                                <p className="mt-1">Roles: {formatArrayValue(row.rolesHiringFor)}</p>
+                                <p className="mt-1">Skills: {formatArrayValue(row.skillsToEvaluate)}</p>
+                              </div>
+                            </div>
+
+                            <div className="mt-5 grid gap-5 xl:grid-cols-2">
+                              <div className="space-y-4">
+                                <div>
+                                  <p className="text-[16px] font-bold uppercase tracking-widest text-purple-500">Business Context</p>
+                                  <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                    {renderPlainBlock(row.problemContext || 'Not provided')}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-[16px] font-bold uppercase tracking-widest text-purple-500">Problem Statement</p>
+                                  <p className="mt-2 text-[16px] font-bold text-text-primary">
+                                    {draft?.problemStatement.title || 'Not generated yet'}
+                                  </p>
+                                  <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                    {renderPlainBlock(draft?.problemStatement.summary || 'Not provided')}
+                                  </p>
+                                  <p className="mt-3 whitespace-pre-wrap text-[16px] text-text-muted">
+                                    {renderPlainBlock(draft?.problemStatement.candidatePrompt || 'Not provided')}
+                                  </p>
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <div className="border border-border p-4">
+                                    <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Evaluation</p>
+                                    <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                      {renderPlainBlock(formatArrayValue(draft?.evaluationCriteria || []))}
+                                    </p>
+                                  </div>
+                                  <div className="border border-border p-4">
+                                    <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Deliverables</p>
+                                    <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                      {renderPlainBlock(formatArrayValue(draft?.deliverables || []))}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-4">
+                                {rounds.map(([label, round]) => (
+                                  <div key={label} className="border border-border p-4">
+                                    <p className="text-[16px] font-bold uppercase tracking-widest text-purple-500">{label}</p>
+                                    <p className="mt-2 text-[16px] font-bold text-text-primary">{round?.title || 'Not provided'}</p>
+                                    <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                      {renderPlainBlock(round?.objective || 'No objective recorded')}
+                                    </p>
+                                    <p className="mt-3 whitespace-pre-wrap text-[16px] text-text-muted">
+                                      {renderPlainBlock(round?.task || 'No task recorded')}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="mt-5 grid gap-4 xl:grid-cols-3">
+                              <div className="border border-border p-4">
+                                <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Constraints</p>
+                                <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                  {renderPlainBlock(formatArrayValue(draft?.constraints || []))}
+                                </p>
+                              </div>
+                              <div className="border border-border p-4">
+                                <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Review Notes</p>
+                                <p className="mt-2 whitespace-pre-wrap text-[16px] text-text-secondary">
+                                  {renderPlainBlock(formatArrayValue(draft?.reviewNotes || []))}
+                                </p>
+                              </div>
+                              <div className="border border-border p-4">
+                                <p className="text-[16px] font-bold uppercase tracking-widest text-gold-500">Submission Metadata</p>
+                                <p className="mt-2 text-[16px] text-text-secondary">
+                                  Final round attendee: {row.finalRoundAttendeeName || 'Not provided'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-secondary">
+                                  Role: {row.finalRoundAttendeeRole || 'Not provided'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-secondary">
+                                  Timeline: {row.preferredTimeline || 'Not provided'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-secondary">
+                                  Tech stack: {row.techStack || 'Not provided'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-secondary">
+                                  Strong solution criteria: {row.strongSolutionCriteria || 'Not provided'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-secondary">
+                                  Challenge suggested: {row.suggestChallenge ? 'Yes' : 'No'}
+                                </p>
+                                <p className="mt-1 text-[16px] text-text-muted">Last updated: {formatDateTime(row.updatedAt)}</p>
+                              </div>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               )}
