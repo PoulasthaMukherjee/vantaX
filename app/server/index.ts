@@ -54,12 +54,17 @@ app.use(express.json({
 }));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
+// Health check endpoint for Railway
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/candidates', candidatesRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/company-flow', companyFlowRouter);
 app.use('/api/jury', juryRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/payment', paymentRouter);
+
+// API 404 — prevent unmatched API routes from falling through to SPA
+app.all('/api/*', (_req, res) => res.status(404).json({ error: 'Not found' }));
 
 // Serve Vite build in production
 const distPath = path.join(__dirname, '../dist');
