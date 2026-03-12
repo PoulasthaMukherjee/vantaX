@@ -10,6 +10,7 @@ export default function Rubric() {
       <SectionHeader
         label="Scoring"
         title="Transparent scoring. No guesswork."
+        lead="All submissions go through multi-stage scoring: AI pre-score, integrity checks, and human moderation on a standardized rubric. Top performers get shortlisted for interviews."
       />
 
       <StaggerContainer className="flex flex-col gap-px" staggerDelay={0.08}>

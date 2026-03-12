@@ -198,7 +198,7 @@ export default function RegistrationForm() {
             <span className="text-purple-500">{'$ '}</span>vantax --register
           </h2>
           <p className="text-text-muted text-[16px] mb-2">Seats capped per problem. Once full, registration closes.</p>
-          <p className="text-gold-500 text-[16px] font-bold mb-8">₹199 + GST — Access all 3 challenges + structured hiring exposure</p>
+          <p className="text-gold-500 text-[16px] font-bold mb-8">₹199 + GST — Access all 3 challenges + get shortlisted for interviews</p>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <FormSection title="Basic Information">
@@ -216,7 +216,7 @@ export default function RegistrationForm() {
                 <label className="block text-[16px] font-medium mb-1">
                   Resume (PDF) <span className="text-gold-500">*</span>
                 </label>
-                <p className="text-[16px] text-text-muted mb-1.5">For reference only — your execution in the challenges is what gets evaluated.</p>
+                <p className="text-[16px] text-text-muted mb-1.5">Resume is collected for recruiter context only. Shortlisting is based on your challenge performance.</p>
                 <input
                   ref={fileRef}
                   type="file"

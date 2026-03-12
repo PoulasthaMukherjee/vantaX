@@ -3,9 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const links = [
-  { to: '/what-is-vantax', label: '--about' },
+  { to: '/what-is-vantax', label: '--what-is-vantax' },
   { to: '/companies', label: '--companies' },
-  { to: '/jury', label: '--jury' },
+  { to: '/jury', label: '--join-as-jury' },
 ];
 
 export default function Navbar() {

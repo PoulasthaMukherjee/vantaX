@@ -12,7 +12,7 @@ export default function JuryPage() {
     <>
       <SEO
         title="Join the Jury — Review Real-World Submissions | VantaX 2026"
-        description="Become a VantaX jury member. Review top submissions from early-career builders solving real business problems. Shape who gets hired."
+        description="Become a VantaX jury member. Review top submissions from early-career builders solving real business problems. Help identify who gets shortlisted."
         path="/jury"
         breadcrumbs={[
           { name: 'Home', path: '/' },

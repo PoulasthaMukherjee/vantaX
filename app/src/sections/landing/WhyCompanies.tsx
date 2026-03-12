@@ -12,9 +12,9 @@ export default function WhyCompanies() {
   return (
     <section className="py-20 px-4 max-w-[1000px] mx-auto">
       <SectionHeader
-        label="Why Participate"
-        title="Why companies participate in VantaX."
-        lead="Skip the resume pile. Access execution-ranked, pre-filtered talent with a transparent audit trail — in 7 days."
+        label="What You Get"
+        title="What hiring partners get back."
+        lead="Candidates solve real problems from your company. You get a pre-screened shortlist instead of another resume pile."
       />
 
       <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px">

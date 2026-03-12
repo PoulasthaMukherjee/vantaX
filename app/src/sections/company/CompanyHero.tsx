@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Button from '../../components/ui/Button';
 
@@ -17,7 +18,7 @@ export default function CompanyHero() {
         </p>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6">
-          Stop screening <span className="text-gold-500">500 resumes.</span>
+          Hire engineers by seeing them solve your <span className="text-gold-500">problem</span>
         </h1>
 
         <motion.p
@@ -26,8 +27,9 @@ export default function CompanyHero() {
           transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-[16px] text-text-muted max-w-2xl mx-auto leading-relaxed"
         >
-          Watch candidates solve your actual problem instead. Submit a real business challenge —
-          get ranked, rubric-scored submissions and direct access to top performers.
+          Share one real problem from your company. VantaX converts it into a 3-round hiring
+          audition and screens candidates for you. You only review the{' '}
+          <span className="text-gold-500">top finalists</span>.
         </motion.p>
 
         <motion.div
@@ -36,13 +38,22 @@ export default function CompanyHero() {
           transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="mt-10 flex flex-wrap gap-3 justify-center"
         >
-          <a href="#intake">
-            <Button className="animate-glow-pulse">Submit a Problem</Button>
-          </a>
+          <Link to="/companies/start">
+            <Button className="animate-glow-pulse">Run a Hiring Audition</Button>
+          </Link>
           <a href="#how-it-works">
             <Button variant="outline">Learn How It Works</Button>
           </a>
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-6 text-[12px] uppercase tracking-[0.12em] text-text-muted"
+        >
+          One company problem - three audition rounds - top candidates for interview
+        </motion.p>
       </motion.div>
     </section>
   );

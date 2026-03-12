@@ -9,6 +9,7 @@ import { ensureDatabaseSchema } from './db';
 import adminRouter from './routes/admin';
 import candidatesRouter from './routes/candidates';
 import companiesRouter from './routes/companies';
+import companyFlowRouter from './routes/companyFlow';
 import juryRouter from './routes/jury';
 import paymentRouter from './routes/payment';
 
@@ -31,6 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 app.use('/api/candidates', candidatesRouter);
 app.use('/api/companies', companiesRouter);
+app.use('/api/company-flow', companyFlowRouter);
 app.use('/api/jury', juryRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/payment', paymentRouter);

@@ -42,7 +42,7 @@ export default function Hero() {
             Real companies post <span className="text-purple-400">real problems</span>.
             You solve them under constraint.
             AI tools <span className="text-purple-400">encouraged</span>.
-            Your execution becomes your resume.
+            Your execution matters more than your resume.
           </motion.p>
 
           <motion.div
@@ -65,8 +65,7 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="flex gap-6 text-[16px] text-text-muted"
           >
-            <Link to="/companies" className="hover:text-gold-500 transition-colors">Company? Submit a problem &rarr;</Link>
-            <Link to="/jury" className="hover:text-gold-500 transition-colors">Expert? Join as jury &rarr;</Link>
+            <Link to="/companies" className="hover:text-gold-500 transition-colors">Company? Run a Hiring Audition - we do the work &rarr;</Link>
           </motion.div>
         </motion.div>
       </div>

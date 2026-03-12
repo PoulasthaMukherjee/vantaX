@@ -5,9 +5,9 @@ export default function Footer() {
     <footer className="border-t border-border py-8 px-4 text-center">
       <div className="max-w-[1000px] mx-auto">
         <div className="flex flex-wrap items-center justify-center gap-6 mb-4 text-[16px] text-text-muted">
-          <Link to="/what-is-vantax" className="hover:text-gold-500 transition-colors">--about</Link>
+          <Link to="/what-is-vantax" className="hover:text-gold-500 transition-colors">--what-is-vantax</Link>
           <Link to="/companies" className="hover:text-gold-500 transition-colors">--companies</Link>
-          <Link to="/jury" className="hover:text-gold-500 transition-colors">--jury</Link>
+          <Link to="/jury" className="hover:text-gold-500 transition-colors">--join-as-jury</Link>
           <a href="mailto:hello@vantahire.com" className="hover:text-gold-500 transition-colors">hello@vantahire.com</a>
         </div>
         <p className="text-text-muted text-[16px]">

@@ -29,42 +29,40 @@ function field(label: string, value: string | null | undefined): string {
 }
 
 export function companyNotificationEmail(data: Record<string, any>): { subject: string; html: string } {
+  const roles = Array.isArray(data.rolesHiringFor) ? data.rolesHiringFor.join(', ') : data.rolesHiringFor;
+  const skills = Array.isArray(data.skillsLookingFor) ? data.skillsLookingFor.join(', ') : data.skillsLookingFor;
   const body = `
     <div class="card">
       <h3 style="color:#A78BFA;margin-top:0;">Company Details</h3>
       ${field('Company', data.companyName)}
       ${field('Website', data.websiteUrl)}
+      ${field('Company Size', data.companySize || data.companyStage)}
       ${field('Industry', data.industry)}
-      ${field('Stage', data.companyStage)}
+      ${field('Roles Hiring For', roles)}
+      ${field('Number of Roles', data.numberRoles || data.approxOpenings)}
+    </div>
+    <div class="card">
+      <h3 style="color:#FF5BA8;margin-top:0;">Company Problem</h3>
+      ${field('Problem Description', data.problemDescription || data.businessContext)}
+      ${field('Skills to Evaluate', skills)}
+      ${field('Tech Stack', data.techStack || data.preferredStack)}
+      ${field('Strong Solution Should Demonstrate', data.strongSolutionCriteria || data.customEvalCriteria)}
+    </div>
+    <div class="card">
+      <h3 style="color:#FBBF24;margin-top:0;">Participation Details</h3>
+      ${field('Final Round Attendee', data.finalRoundAttendeeName)}
+      ${field('Final Round Attendee Role', data.finalRoundAttendeeRole)}
+      ${field('Preferred Timeline', data.preferredTimeline)}
       ${field('Contact', data.contactName)}
-      ${field('Role', data.contactRole)}
       ${field('Email', data.contactEmail)}
-      ${field('Phone', data.contactPhone)}
+      ${field('LinkedIn', data.contactLinkedin)}
+      ${field('Suggest a challenge?', data.suggestChallenge ? 'Yes' : 'No')}
     </div>
-    <div class="card">
-      <h3 style="color:#FF5BA8;margin-top:0;">Problem Statement</h3>
-      ${field('Title', data.problemTitle)}
-      ${field('Business Context', data.businessContext)}
-      ${field('Core Task', data.coreTask)}
-      ${field('Expected Deliverables', data.expectedDeliverables)}
-      ${field('Preferred Stack', data.preferredStack)}
-      ${field('Tool Restrictions', data.toolRestrictions)}
-      ${field('Difficulty Level', data.difficultyLevel)}
-    </div>
-    <div class="card">
-      <h3 style="color:#FBBF24;margin-top:0;">Jury & Hiring</h3>
-      ${field('Nominate Jury?', data.nominateJury)}
-      ${field('Jury Name', data.juryName)}
-      ${field('Jury Designation', data.juryDesignation)}
-      ${field('Custom Eval Criteria', data.customEvalCriteria)}
-      ${field('Hiring Intent', data.hiringIntent)}
-      ${field('Approx Openings', data.approxOpenings)}
-      ${field('Skills', data.skillsLookingFor)}
-    </div>`;
+  `;
 
   return {
     subject: `[VantaX] New Company Submission: ${data.companyName}`,
-    html: wrap('VantaX Company Submission', 'New problem statement received', body),
+    html: wrap('VantaX Company Submission', 'New hiring audition partner request received', body),
   };
 }
 
@@ -72,15 +70,55 @@ export function companyConfirmationEmail(data: Record<string, any>): { subject: 
   const body = `
     <div class="card">
       <p style="color:#A1A1AA;">Hi ${escapeHtml(data.contactName)},</p>
-      <p style="color:#fff;">Thank you for submitting a problem statement to <span class="primary">VantaX 2026</span>.</p>
-      <p style="color:#A1A1AA;">We've received your submission for <span class="accent">"${escapeHtml(data.problemTitle)}"</span> from <strong>${escapeHtml(data.companyName)}</strong>.</p>
-      <p style="color:#A1A1AA;">Our team will review your problem statement for scope alignment and confirm your participation within 3 business days.</p>
+      <p style="color:#fff;">Thank you for applying to become a <span class="primary">VantaX hiring partner</span>.</p>
+      <p style="color:#A1A1AA;">We've received your company problem from <strong>${escapeHtml(data.companyName)}</strong> and will review how to convert it into a hiring audition.</p>
+      <p style="color:#A1A1AA;">Our team will follow up on scope, timeline, and final-round coordination shortly.</p>
       <p style="color:#A1A1AA;margin-top:16px;">If you have questions, reply to this email or reach out at hello@vantahire.com.</p>
     </div>`;
 
   return {
-    subject: `VantaX 2026 — Submission Received: ${data.problemTitle}`,
-    html: wrap('Submission Received', `VantaX 2026 — ${data.companyName}`, body),
+    subject: `VantaX 2026 — Hiring Partner Request Received`,
+    html: wrap('Request Received', `VantaX 2026 — ${data.companyName}`, body),
+  };
+}
+
+export function companyFlowVerificationEmail(data: {
+  contactName: string;
+  companyName: string;
+  code: string;
+}): { subject: string; html: string } {
+  const body = `
+    <div class="card">
+      <p style="color:#A1A1AA;">Hi ${escapeHtml(data.contactName)},</p>
+      <p style="color:#fff;">Use the verification code below to unlock your <span class="primary">VantaX hiring audition draft</span>.</p>
+      <div style="margin:24px 0;padding:20px;border:1px dashed rgba(255,255,255,0.14);text-align:center;">
+        <div class="label">Verification Code</div>
+        <div style="font-size:32px;font-weight:700;letter-spacing:0.2em;color:#FBBF24;">${escapeHtml(data.code)}</div>
+      </div>
+      <p style="color:#A1A1AA;">This code expires in 15 minutes for <strong>${escapeHtml(data.companyName)}</strong>.</p>
+    </div>`;
+
+  return {
+    subject: 'VantaX — Verify your work email',
+    html: wrap('Verify Your Work Email', `VantaX hiring audition for ${data.companyName}`, body),
+  };
+}
+
+export function companyFlowDraftSubmittedEmail(data: {
+  contactName: string;
+  companyName: string;
+}): { subject: string; html: string } {
+  const body = `
+    <div class="card">
+      <p style="color:#A1A1AA;">Hi ${escapeHtml(data.contactName)},</p>
+      <p style="color:#fff;">Your hiring audition draft for <span class="primary">${escapeHtml(data.companyName)}</span> has been submitted for review.</p>
+      <p style="color:#A1A1AA;">Our team will review the generated assessment, tighten scope where needed, and follow up on next steps.</p>
+      <p style="color:#A1A1AA;margin-top:16px;">If you need to update anything, reply to this email or contact hello@vantahire.com.</p>
+    </div>`;
+
+  return {
+    subject: 'VantaX — Draft submitted for review',
+    html: wrap('Draft Submitted', `VantaX hiring audition for ${data.companyName}`, body),
   };
 }
 

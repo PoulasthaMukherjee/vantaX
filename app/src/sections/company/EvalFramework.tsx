@@ -7,7 +7,7 @@ export default function EvalFramework() {
       <SectionHeader
         label="Evaluation"
         title="How we score your candidates."
-        lead="All submissions are scored across a transparent, standardized rubric — so you can trust the results and compare candidates objectively."
+        lead="All submissions go through multi-stage scoring: AI pre-score, integrity checks, and human moderation on a standardized rubric. You review top finalists."
       />
 
       <div className="overflow-x-auto border border-border">

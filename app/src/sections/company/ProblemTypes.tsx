@@ -1,33 +1,39 @@
-import { ArrowRight } from 'lucide-react';
 import SectionHeader from '../../components/ui/SectionHeader';
 import FadeInOnScroll from '../../components/motion/FadeInOnScroll';
-import { PROBLEM_TYPES } from '../../lib/constants';
+import Card from '../../components/ui/Card';
 
 export default function ProblemTypes() {
+  const examples = [
+    {
+      label: 'Backend',
+      problem: 'Design a job queue system handling 1M tasks per day.',
+    },
+    {
+      label: 'AI / ML',
+      problem: 'Build a document retrieval system for knowledge search.',
+    },
+    {
+      label: 'Frontend',
+      problem: 'Create a monitoring dashboard for system metrics.',
+    },
+  ];
+
   return (
     <section className="py-20 px-4 max-w-[1000px] mx-auto">
       <SectionHeader
-        label="Problems"
-        title="What kind of problems should you submit?"
-        lead="Your problem should be solvable by one person within 2 hours, test structured thinking and execution, and reflect a real scenario."
+        label="Example Problems"
+        title="Examples of the kinds of problems companies can submit."
+        lead="Share one real engineering or product problem. VantaX scopes it into a structured audition rather than asking your team to design an assessment from scratch."
       />
 
       <FadeInOnScroll>
-        <div className="bg-card border border-border p-8">
-          <h3 className="font-bold text-[16px] text-gold-500 mb-4">
-            <span className="text-purple-500">{'// '}</span>Strong problem examples:
-          </h3>
-          <ul className="space-y-3">
-            {PROBLEM_TYPES.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-[16px] text-text-secondary">
-                <ArrowRight size={14} className="text-gold-500 mt-1 flex-shrink-0" />
-                {p}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 text-[16px] text-text-muted italic">
-            This is about evaluating capability and judgment — not building finished products.
-          </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {examples.map((example) => (
+            <Card key={example.label} className="h-full">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-gold-500">{example.label}</p>
+              <p className="mt-3 text-[14px] text-text-primary leading-relaxed">{example.problem}</p>
+            </Card>
+          ))}
         </div>
       </FadeInOnScroll>
     </section>

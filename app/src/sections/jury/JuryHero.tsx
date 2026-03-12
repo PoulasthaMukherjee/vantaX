@@ -29,7 +29,7 @@ export default function JuryHero() {
           className="text-[16px] text-text-muted max-w-2xl mx-auto leading-relaxed"
         >
           We need evaluators who understand what good execution looks like in the real world.
-          Review top submissions, shape who gets hired.
+          Review top submissions and help identify who gets shortlisted.
         </motion.p>
 
         <motion.div

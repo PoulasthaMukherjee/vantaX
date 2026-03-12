@@ -28,7 +28,7 @@ export const WHAT_IS_CARDS = [
     icon: 'Target',
     color: 'success',
     title: 'Direct Hiring Pipeline',
-    description: "Top performers are mapped directly to participating companies for internship and entry-level interviews. Built for outcomes — not certificates.",
+    description: "Top performers are introduced to partner companies for internship and entry-level interviews. Built for outcomes — not certificates.",
   },
 ];
 
@@ -92,15 +92,17 @@ export const WHAT_YOU_GAIN = [
   { icon: 'Rocket', title: 'Early Talent Pipeline', description: 'Identify high-potential freshers before competitors do' },
 ];
 
-export const INDUSTRY_OPTIONS = [
-  'SaaS', 'HRTech', 'AI / ML Product', 'EdTech', 'FinTech',
-  'Automation / Workflow', 'MSME Tech', 'Other',
-];
+export const INDUSTRY_OPTIONS = ['SaaS', 'AI', 'Fintech', 'Developer Tools', 'Marketplace', 'Other'];
 
-export const COMPANY_STAGE_OPTIONS = [
-  'Early-stage (0–20 employees)',
-  'Growth-stage (20–100 employees)',
-  'Established (100+ employees)',
+export const COMPANY_SIZE_OPTIONS = ['1–10', '11–50', '51–200', '200+'];
+
+export const ROLE_OPTIONS = [
+  'Backend Engineer',
+  'Frontend Engineer',
+  'Fullstack Engineer',
+  'AI Engineer',
+  'Data Engineer',
+  'Other',
 ];
 
 export const DIFFICULTY_OPTIONS = [
@@ -109,33 +111,15 @@ export const DIFFICULTY_OPTIONS = [
   { value: 'Execution-Heavy', description: 'Requires strong implementation; working code expected' },
 ];
 
-export const HIRING_INTENT_OPTIONS = [
-  'Yes — Paid internship',
-  'Yes — Stipend-based internship',
-  'Yes — Entry-level / full-time role',
-  'Depends on quality of submissions',
-  'No — participating for talent visibility only',
-];
+export const TIMELINE_OPTIONS = ['Within 2 weeks', 'Within 1 month', 'Flexible'];
 
 export const SKILLS_OPTIONS = [
-  'Python', 'JavaScript / Node.js', 'Prompt engineering / LLM integration',
-  'Backend development', 'Frontend / React', 'System design',
-  'Automation / scripting', 'Data analysis', 'AI/ML fundamentals',
-];
-
-export const DELIVERABLE_OPTIONS = [
-  'Code (GitHub link or ZIP upload)',
-  'Structured explanation (PDF/Doc)',
-  'Flow diagram / system architecture',
-  'Short demo video (2–3 min)',
-  'Logic document / pseudocode',
-];
-
-export const CONFIRMATION_ITEMS = [
-  'The problem does not require proprietary or confidential data',
-  'It can reasonably be attempted by one person within 2 hours',
-  'It is intended for evaluation of early-career candidates',
-  'AI tools may be used by participants unless specified restrictions above',
+  'System Design',
+  'Backend Development',
+  'Frontend Development',
+  'Algorithms',
+  'AI/ML',
+  'Data Engineering',
 ];
 
 export const JURY_WHY_FORMAT = [
@@ -143,7 +127,7 @@ export const JURY_WHY_FORMAT = [
   '3 challenges, each with a 2-hour timed window — individual submissions',
   'AI tools permitted — testing judgment, not memorization',
   'Structured and comparable — rubric-scored, not vibes-judged',
-  'Top performers mapped directly to internship pipelines',
+  'You help validate who gets shortlisted',
 ];
 
 export const JURY_ROLES = [
@@ -178,12 +162,12 @@ export const WHY_VANTAX_EXISTS = [
 ];
 
 export const WHY_COMPANIES_PARTICIPATE = [
-  { icon: 'Filter', title: 'Pre-Filtered Talent', description: 'Execution-ranked candidates — only top 5% reach your pipeline' },
-  { icon: 'Brain', title: 'AI-Scored Submissions', description: 'Structured AI evaluation with human moderation overlay' },
-  { icon: 'MapPin', title: 'No Campus Travel', description: 'Zero logistics cost — fully online, company-branded problems' },
-  { icon: 'PhoneOff', title: 'No Mass Screening Calls', description: 'Skip the 500-call funnel — work speaks for itself' },
-  { icon: 'ClipboardCheck', title: 'Transparent Audit Trail', description: 'Every score backed by rubric evidence and structured reasoning' },
-  { icon: 'Zap', title: '7-Day Turnaround', description: 'From challenge to shortlist in one week — hiring at execution speed' },
+  { icon: 'Filter', title: 'Pre-Screened Talent', description: 'You review finalists, not a raw candidate pile.' },
+  { icon: 'Brain', title: 'Real Problem Solving', description: 'Candidates are evaluated on how they tackle your company problem.' },
+  { icon: 'MapPin', title: 'Low-Lift Participation', description: 'Share one problem and join the final round. VantaX runs the process.' },
+  { icon: 'PhoneOff', title: 'Fewer Early Interviews', description: 'Replace screening calls and generic take-homes with one audition flow.' },
+  { icon: 'ClipboardCheck', title: 'Structured Evaluation', description: 'Each finalist comes with work samples, reasoning, and evaluation context.' },
+  { icon: 'Zap', title: 'Faster Hiring', description: 'Move from problem intake to shortlist without building the assessment yourself.' },
 ];
 
 export const INTEGRITY_ITEMS = [
@@ -195,7 +179,7 @@ export const INTEGRITY_ITEMS = [
 ];
 
 export const SCORING_DETAILS = [
-  'Multi-stage scoring: AI pre-score + human moderation',
+  'Multi-stage scoring: AI pre-score, integrity checks, and human moderation on a standardized rubric',
   'Standard deviation normalization across problem pools',
   'Inter-rater reliability check for top 10% submissions',
 ];
@@ -239,7 +223,7 @@ export const FAQ_DATA = [
   },
   {
     question: 'Is it free or paid?',
-    answer: '₹199 + GST to register. This gives you access to all 3 challenges, structured hiring exposure, and a direct path to participating companies.',
+    answer: '₹199 + GST to register. This gives you access to all 3 challenges, a chance to get shortlisted for interviews, and introductions to participating companies.',
   },
 ];
 

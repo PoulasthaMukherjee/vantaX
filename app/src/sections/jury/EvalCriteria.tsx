@@ -8,7 +8,7 @@ export default function EvalCriteria() {
       <SectionHeader
         label="Criteria"
         title="What you'll evaluate against."
-        lead="A standardized evaluation sheet will be provided. You score on the rubric — not on style preferences. Your expertise ensures top performers are identified fairly."
+        lead="All submissions go through multi-stage scoring: AI pre-score, integrity checks, and human moderation on a standardized rubric. You help validate who gets shortlisted."
       />
 
       <FadeInOnScroll>
