@@ -129,6 +129,14 @@ export function injectMeta(html: string, pathname: string): string {
     );
   }
 
+  // Inject hreflang tags (self-referencing en-IN + x-default)
+  if (!meta.noindex) {
+    html = html.replace(
+      '</head>',
+      `    <link rel="alternate" hreflang="en-IN" href="${escapeAttr(url)}" />\n    <link rel="alternate" hreflang="x-default" href="${escapeAttr(url)}" />\n  </head>`,
+    );
+  }
+
   // Inject noindex for pages that need it
   if (meta.noindex) {
     html = html.replace(
