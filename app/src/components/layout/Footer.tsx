@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
+import PixelFooterCanvas from './PixelFooterCanvas';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border py-8 px-4 text-center">
+    <footer className="border-t border-border text-center">
+      <PixelFooterCanvas />
+      <div className="py-8 px-4">
       <div className="max-w-[1000px] mx-auto">
         <div className="flex flex-wrap items-center justify-center gap-6 mb-4 text-[16px] text-text-muted">
           <Link to="/what-is-vantax" className="hover:text-gold-500 transition-colors py-2">--what-is-vantax</Link>
@@ -37,6 +40,7 @@ export default function Footer() {
           </a>{' '}
           &middot; Bangalore, India &middot; &copy; {new Date().getFullYear()}
         </p>
+      </div>
       </div>
     </footer>
   );
