@@ -1,0 +1,152 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: vibe-alerts
+  namespace: vibe
+  labels:
+    app: vibe
+    prometheus: main
+spec:
+  groups:
+    - name: vibe.availability
+      interval: 30s
+      rules:
+        # API Down - critical
+        - alert: VibeAPIDown
+          expr: up{job="vibe-api"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            service: vibe-api
+          annotations:
+            summary: "Vibe API is down"
+            description: "The Vibe API has been unreachable for more than 1 minute."
+            runbook_url: "https://docs.vibe.dev/runbooks/api-down"
+
+    - name: vibe.queue
+      interval: 30s
+      rules:
+        # High queue depth - warning at 50, critical at 100
+        - alert: VibeHighQueueDepth
+          expr: vibe_queue_depth > 50
+          for: 5m
+          labels:
+            severity: warning
+            service: vibe-worker
+          annotations:
+            summary: "High queue depth ({{ $value }} jobs)"
+            description: "The scoring queue has {{ $value }} pending jobs. Consider scaling workers."
+
+        - alert: VibeQueueDepthCritical
+          expr: vibe_queue_depth > 100
+          for: 3m
+          labels:
+            severity: critical
+            service: vibe-worker
+          annotations:
+            summary: "Critical queue depth ({{ $value }} jobs)"
+            description: "The scoring queue has {{ $value }} pending jobs exceeding SLO threshold."
+            runbook_url: "https://docs.vibe.dev/runbooks/queue-depth"
+
+        # Failed jobs accumulating
+        - alert: VibeHighFailedJobs
+          expr: vibe_queue_failed_count > 10
+          for: 5m
+          labels:
+            severity: warning
+            service: vibe-worker
+          annotations:
+            summary: "{{ $value }} failed jobs in DLQ"
+            description: "There are {{ $value }} failed jobs in the dead letter queue. Review and rescore or clear."
+
+        - alert: VibeFailedJobsCritical
+          expr: vibe_queue_failed_count > 50
+          for: 5m
+          labels:
+            severity: critical
+            service: vibe-worker
+          annotations:
+            summary: "Critical: {{ $value }} failed jobs"
+            description: "DLQ has {{ $value }} failed jobs. Immediate investigation required."
+
+    - name: vibe.latency
+      interval: 30s
+      rules:
+        # Job latency SLO breach (P95 > 180s)
+        - alert: VibeHighJobLatency
+          expr: vibe_job_latency_seconds{quantile="0.95"} > 180
+          for: 5m
+          labels:
+            severity: warning
+            service: vibe-worker
+          annotations:
+            summary: "High job latency (P95: {{ $value }}s)"
+            description: "Job completion P95 latency is {{ $value }}s, exceeding 180s SLO."
+
+        - alert: VibeJobLatencyCritical
+          expr: vibe_job_latency_seconds{quantile="0.95"} > 300
+          for: 5m
+          labels:
+            severity: critical
+            service: vibe-worker
+          annotations:
+            summary: "Critical job latency (P95: {{ $value }}s)"
+            description: "Job completion P95 latency is {{ $value }}s. Scoring may be stuck."
+
+    - name: vibe.llm
+      interval: 60s
+      rules:
+        # LLM error rate > 10%
+        - alert: VibeLLMHighErrorRate
+          expr: |
+            (vibe_llm_errors_total / vibe_llm_calls_total) > 0.10
+            and vibe_llm_calls_total > 10
+          for: 5m
+          labels:
+            severity: warning
+            service: vibe-llm
+          annotations:
+            summary: "High LLM error rate ({{ $value | humanizePercentage }})"
+            description: "LLM API error rate is {{ $value | humanizePercentage }} over the last hour."
+
+        - alert: VibeLLMErrorRateCritical
+          expr: |
+            (vibe_llm_errors_total / vibe_llm_calls_total) > 0.30
+            and vibe_llm_calls_total > 10
+          for: 5m
+          labels:
+            severity: critical
+            service: vibe-llm
+          annotations:
+            summary: "Critical LLM error rate ({{ $value | humanizePercentage }})"
+            description: "LLM API error rate is {{ $value | humanizePercentage }}. Scoring may be failing."
+            runbook_url: "https://docs.vibe.dev/runbooks/llm-errors"
+
+        # LLM cost spike (>$10/hour)
+        - alert: VibeLLMHighCost
+          expr: vibe_llm_cost_usd_total > 10
+          for: 10m
+          labels:
+            severity: warning
+            service: vibe-llm
+          annotations:
+            summary: "High LLM cost (${{ $value }}/hr)"
+            description: "LLM API cost is ${{ $value }} in the last hour. Review for anomalies."
+
+    - name: vibe.submissions
+      interval: 60s
+      rules:
+        # High failure rate in submissions
+        - alert: VibeHighSubmissionFailureRate
+          expr: |
+            (
+              vibe_submissions_total{status="CLONE_FAILED"} +
+              vibe_submissions_total{status="SCORE_FAILED"}
+            ) / ignoring(status) sum(vibe_submissions_total) > 0.10
+          for: 10m
+          labels:
+            severity: warning
+            service: vibe-api
+          annotations:
+            summary: "High submission failure rate"
+            description: "More than 10% of submissions are failing. Check clone/scoring pipeline."

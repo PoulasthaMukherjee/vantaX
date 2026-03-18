@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vibe-scheduler
+  labels:
+    app: vibe
+    component: scheduler
+spec:
+  # Single replica - scheduler handles its own intervals
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vibe
+      component: scheduler
+  template:
+    metadata:
+      labels:
+        app: vibe
+        component: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: gcr.io/PROJECT_ID/vibe-api:latest
+          command: ["python", "-m", "app.worker.scheduler"]
+          envFrom:
+            - secretRef:
+                name: vibe-secrets
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "python -c \"import os; import redis; r = redis.from_url(os.environ['REDIS_URL']); r.ping()\""
+            initialDelaySeconds: 10
+            periodSeconds: 60

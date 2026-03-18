@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VantaX 2026 — Terminal Theme Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D0D1A;
+    --bg-card: #141428;
+    --bg-card-hover: #1a1a36;
+    --border: rgba(255,255,255,0.08);
+    --border-bright: rgba(255,255,255,0.15);
+    --primary: #A78BFA;
+    --primary-dim: #8b5cf6;
+    --pink: #FF5BA8;
+    --blue: #2D81FF;
+    --gold: #FBBF24;
+    --gold-dim: #f59e0b;
+    --success: #22c55e;
+    --text: #e4e4e7;
+    --text-secondary: #a1a1aa;
+    --text-muted: #52525b;
+    --font-display: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-display);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(167, 139, 250, 0.008) 3px, rgba(167, 139, 250, 0.008) 6px);
+  }
+
+  /* Grid pattern */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(139, 92, 246, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  ::selection { background: var(--primary); color: var(--bg); }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .stagger-1 { transition-delay: 0.05s; }
+  .stagger-2 { transition-delay: 0.1s; }
+  .stagger-3 { transition-delay: 0.15s; }
+  .stagger-4 { transition-delay: 0.2s; }
+  .stagger-5 { transition-delay: 0.25s; }
+  .stagger-6 { transition-delay: 0.3s; }
+  .stagger-7 { transition-delay: 0.35s; }
+
+  /* ── KEYFRAMES ── */
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+  @keyframes cursor-blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+  @keyframes float-slow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 20px rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 40px rgba(245,158,11,0.6), 0 0 60px rgba(139,92,246,0.3); } }
+  @keyframes neon-border { 0%,100% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 8px rgba(139,92,246,0.15); } 50% { border-color: rgba(245,158,11,0.4); box-shadow: 0 0 12px rgba(245,158,11,0.2); } }
+  @keyframes slide-in-left { from { opacity:0; transform: translateX(-40px); } to { opacity:1; transform: translateX(0); } }
+  @keyframes slide-in-right { from { opacity:0; transform: translateX(40px); } to { opacity:1; transform: translateX(0); } }
+  @keyframes scale-in { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
+  @keyframes typewriter { from { width: 0; } to { width: 100%; } }
+  @keyframes hero-glow-pulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+  @keyframes bar-fill { from { width: 0; } }
+  @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(2); opacity: 0; } }
+
+  /* ── NAVBAR ── */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(13, 13, 26, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 100;
+    animation: slide-in-left 0.6s ease-out;
+  }
+  nav .container { display: flex; justify-content: space-between; align-items: center; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo img { height: 32px; width: auto; }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: color 0.3s, text-shadow 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .nav-links a:hover { color: var(--primary); text-decoration: none; text-shadow: 0 0 10px rgba(167,139,250,0.3); }
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 7px 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .nav-cta:hover {
+    background: var(--primary);
+    color: var(--bg);
+    box-shadow: 0 0 24px rgba(167, 139, 250, 0.35);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 100px 0 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, rgba(245,158,11,0.06) 35%, transparent 65%);
+    pointer-events: none;
+    animation: hero-glow-pulse 5s ease-in-out infinite;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-logo {
+    height: 64px;
+    margin-bottom: 32px;
+    animation: scale-in 0.8s ease-out, float-slow 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(167,139,250,0.3));
+  }
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 16px;
+    letter-spacing: 1px;
+    margin-bottom: 32px;
+    border-radius: 2px;
+    animation: neon-border 4s ease-in-out infinite, scale-in 0.6s ease-out 0.2s both;
+  }
+  .hero-badge .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-right: 10px;
+    animation: blink 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px var(--primary);
+    vertical-align: middle;
+    position: relative;
+  }
+  .hero-badge .dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+    animation: pulse-ring 2s ease-out infinite;
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.08;
+    margin-bottom: 24px;
+    color: #fff;
+    animation: scale-in 0.7s ease-out 0.3s both;
+  }
+  .hero h1 .gold {
+    background: linear-gradient(-45deg, #fbbf24, #f59e0b, #fbbf24, #d97706);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 4s ease infinite;
+    text-shadow: none;
+  }
+  .hero h1 .purple {
+    background: linear-gradient(-45deg, #a78bfa, #c4b5fd, #8b5cf6, #a78bfa);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 4s ease infinite;
+    text-shadow: none;
+  }
+
+  .hero-sub {
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 540px;
+    margin: 0 auto 20px;
+    animation: scale-in 0.7s ease-out 0.5s both;
+  }
+  .hero-prompt {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    display: inline-block;
+    padding: 12px 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    animation: scale-in 0.6s ease-out 0.6s both;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-prompt::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(167,139,250,0.05), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
+  .hero-prompt .cmd { color: var(--primary); }
+  .hero-prompt .flag { color: var(--pink); }
+  .hero-prompt .val { color: var(--gold); }
+  .cursor {
+    display: inline-block;
+    width: 9px; height: 17px;
+    background: var(--primary);
+    margin-left: 4px;
+    animation: cursor-blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    box-shadow: 0 0 6px rgba(167,139,250,0.5);
+  }
+
+  .hero-price {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    margin: 16px 0 40px;
+    animation: scale-in 0.6s ease-out 0.7s both;
+  }
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    animation: scale-in 0.7s ease-out 0.8s both;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    color: #fff;
+    border: none;
+    padding: 14px 36px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    transition: width 0.5s, height 0.5s, top 0.5s, left 0.5s;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.4), 0 4px 20px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+  }
+  .btn-primary:hover::after { width: 300px; height: 300px; top: -100px; left: -100px; }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-bright);
+    padding: 14px 36px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+  }
+  .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ── STATS ── */
+  .stats { padding: 60px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+  .stat-card { background: var(--bg); padding: 32px 20px; text-align: center; transition: background 0.3s; }
+  .stat-card:hover { background: var(--bg-card); }
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(251,191,36,0.2);
+  }
+  .stat-label { font-family: var(--font-mono); color: var(--text-muted); font-size: 11px; margin-top: 8px; letter-spacing: 0.5px; }
+
+  /* ── SECTION HEADER ── */
+  .section { padding: 80px 0; }
+  .section-label {
+    font-family: var(--font-mono);
+    color: var(--primary);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+  .section-label::before { content: '$ '; color: var(--text-muted); }
+  .section-title { font-size: 30px; font-weight: 700; color: #fff; margin-bottom: 48px; line-height: 1.3; }
+
+  /* ── TERMINAL WINDOW ── */
+  .terminal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.4s, box-shadow 0.4s;
+  }
+  .terminal:hover {
+    border-color: rgba(167,139,250,0.2);
+    box-shadow: 0 0 40px rgba(139,92,246,0.06);
+  }
+  .terminal-bar {
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .terminal-dot { width: 10px; height: 10px; border-radius: 50%; transition: transform 0.2s; }
+  .terminal:hover .terminal-dot { transform: scale(1.2); }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #28c840; }
+  .terminal-title {
+    margin-left: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .terminal-body { padding: 24px; }
+
+  /* ── CARDS ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .card {
+    border: 1px solid var(--border);
+    padding: 28px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card:hover::before { transform: scaleX(1); }
+  .card:hover {
+    border-color: var(--border-bright);
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .card-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .card-tag.purple { color: var(--primary); }
+  .card-tag.pink { color: var(--pink); }
+  .card-tag.gold { color: var(--gold); }
+  .card-tag.blue { color: var(--blue); }
+  .card h3 { color: #fff; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .card p { color: var(--text-secondary); font-size: 13px; line-height: 1.7; }
+
+  /* ── FORMAT ── */
+  .format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+  .format-item {
+    background: var(--bg-card);
+    padding: 24px;
+    transition: background 0.3s;
+  }
+  .format-item:hover { background: var(--bg-card-hover); }
+  .format-item .label { font-family: var(--font-mono); color: var(--pink); font-size: 10px; letter-spacing: 2px; margin-bottom: 6px; }
+  .format-item h4 { color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .format-item p { color: var(--text-muted); font-size: 12px; }
+
+  /* ── RUBRIC ── */
+  .rubric-item { display: flex; align-items: center; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+  .rubric-item:last-child { border-bottom: none; }
+  .rubric-weight { font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: var(--gold); min-width: 60px; text-align: right; }
+  .rubric-weight span { font-size: 13px; color: var(--text-muted); }
+  .rubric-bar { flex: 1; }
+  .rubric-bar h4 { color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .rubric-bar-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .rubric-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--pink));
+    box-shadow: 0 0 10px rgba(167,139,250,0.3);
+    width: 0;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .rubric-bar-fill.animate { /* width set by JS */ }
+  .rubric-desc { color: var(--text-muted); font-size: 12px; margin-top: 6px; }
+
+  /* ── TIMELINE ── */
+  .timeline-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    transition: padding-left 0.3s, background 0.3s;
+  }
+  .timeline-item:hover { padding-left: 8px; background: rgba(167,139,250,0.02); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-marker { font-family: var(--font-mono); color: var(--text-muted); font-size: 14px; min-width: 16px; padding-top: 1px; transition: color 0.3s; }
+  .timeline-item:hover .timeline-marker { color: var(--primary); }
+  .timeline-date { font-family: var(--font-mono); min-width: 130px; color: var(--gold); font-size: 13px; font-weight: 500; padding-top: 1px; }
+  .timeline-content h4 { color: #fff; font-size: 14px; font-weight: 600; }
+  .timeline-content p { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 80px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    bottom: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(251,191,36,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cta-section h2 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .cta-section .sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 8px; position: relative; z-index: 1; }
+  .cta-section .price { font-family: var(--font-mono); color: var(--gold); font-size: 12px; margin-bottom: 32px; position: relative; z-index: 1; }
+  .cta-section .btn-primary { animation: glow-pulse 3s ease-in-out infinite; position: relative; z-index: 1; }
+
+  /* ── FORM ── */
+  .reg-section { padding: 80px 0; }
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .form-label .req { color: var(--gold); }
+  .form-label::before { content: '> '; color: var(--text-muted); }
+  .form-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 10px 0;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    caret-color: var(--primary);
+  }
+  .form-input:focus {
+    border-bottom-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(167,139,250,0.1);
+  }
+  .form-input::placeholder { color: var(--text-muted); font-size: 13px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .upload-zone {
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .upload-zone:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(167,139,250,0.03);
+  }
+  .form-section-label {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    margin-top: 12px;
+  }
+  .form-section-label::before { content: '# '; color: var(--pink); }
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    color: #fff;
+    border: none;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 28px;
+    transition: all 0.3s;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn:hover {
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* ── FAQ ── */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    cursor: pointer;
+    transition: padding-left 0.3s;
+  }
+  .faq-item:hover { padding-left: 6px; }
+  .faq-q {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+  .faq-q::before { content: '?'; font-family: var(--font-mono); color: var(--gold); font-size: 14px; flex-shrink: 0; }
+  .faq-item:hover .faq-q { color: var(--primary); }
+  .faq-a { color: var(--text-secondary); font-size: 13px; margin-top: 10px; padding-left: 20px; line-height: 1.8; }
+
+  /* ── POWERED BY ── */
+  .powered { padding: 60px 0; border-top: 1px solid var(--border); text-align: center; }
+  .powered-logo {
+    height: 28px;
+    margin-bottom: 20px;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    filter: grayscale(0.3);
+  }
+  .powered-logo:hover { opacity: 1; filter: none; }
+  .powered-item { color: var(--text-secondary); font-size: 13px; padding: 4px 0; }
+  .powered-item::before { content: '+ '; font-family: var(--font-mono); color: var(--text-muted); }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; }
+  .footer-divider {
+    font-family: var(--font-mono);
+    color: rgba(255,255,255,0.06);
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+  }
+  footer .logo-img { height: 28px; margin-bottom: 8px; opacity: 0.7; }
+  footer .tagline { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+  footer .links { display: flex; gap: 24px; justify-content: center; margin-bottom: 20px; }
+  footer .links a { font-family: var(--font-mono); color: var(--text-muted); font-size: 11px; transition: color 0.3s; }
+  footer .links a:hover { color: var(--primary); }
+  footer .copy { color: var(--text-muted); font-size: 12px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .hero-logo { height: 48px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .cards-grid { grid-template-columns: 1fr; }
+    .format-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .timeline-date { min-width: 100px; font-size: 11px; }
+    .hero-prompt { font-size: 11px; padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-logo">
+      <img src="app/public/brand/vantax-logo.png" alt="VantaX">
+    </div>
+    <div class="nav-links">
+      <a href="#about">what_is_vantax</a>
+      <a href="#format">format</a>
+      <a href="#timeline">timeline</a>
+      <a href="#faq">faq</a>
+    </div>
+    <button class="nav-cta" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">./register</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="container hero-content">
+    <img src="app/public/brand/vantax-logo.png" alt="VantaX" class="hero-logo">
+    <div class="hero-badge"><span class="dot"></span>REGISTRATION OPENS 9 MARCH 2026 &middot; SEATS CAPPED</div>
+
+    <h1>
+      <span class="purple">3 Challenges.</span><br>
+      2 Hours Each.<br>
+      <span class="gold">Get Hired.</span>
+    </h1>
+
+    <p class="hero-sub">Real problems from real companies. AI tools permitted. Execution is the only signal that matters.</p>
+
+    <div class="hero-prompt">
+      <span class="cmd">$ vantax</span> <span class="flag">--challenges</span> <span class="val">3</span> <span class="flag">--time</span> <span class="val">"2h each"</span> <span class="flag">--ai</span> <span class="val">enabled</span><span class="cursor"></span>
+    </div>
+
+    <p class="hero-price">&rsaquo; ₹199 + GST &middot; ALL 3 CHALLENGES &middot; DIRECT HIRING PIPELINE</p>
+
+    <div class="hero-buttons">
+      <button class="btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Register Now &rarr;</button>
+      <button class="btn-secondary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card fade-in stagger-1"><div class="stat-value">1.5M</div><div class="stat-label">Engineering grads/year</div></div>
+      <div class="stat-card fade-in stagger-2"><div class="stat-value">83%</div><div class="stat-label">Got no offer in 2024</div></div>
+      <div class="stat-card fade-in stagger-3"><div class="stat-value">3</div><div class="stat-label">Structured assessments</div></div>
+      <div class="stat-card fade-in stagger-4"><div class="stat-value">2hrs</div><div class="stat-label">Per assessment window</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS VANTAX -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-label fade-in">cat what_is_vantax.md</div>
+    <div class="section-title fade-in">Not a hackathon. A hiring-first<br>online assessment.</div>
+    <div class="cards-grid">
+      <div class="card fade-in stagger-1">
+        <div class="card-tag purple">[COMPANIES]</div>
+        <h3>Company-Sourced Problems</h3>
+        <p>No textbook exercises or DSA puzzles. Every problem comes from a real company -- scoped from actual operational, product, or engineering challenges.</p>
+      </div>
+      <div class="card fade-in stagger-2">
+        <div class="card-tag pink">[CHALLENGES]</div>
+        <h3>3 Challenges, 2 Hours Each</h3>
+        <p>Three independent assessments across one week. Each challenge tests different skills. Attempt all three to maximize your signal.</p>
+      </div>
+      <div class="card fade-in stagger-3">
+        <div class="card-tag gold">[AI_TOOLS]</div>
+        <h3>AI Tools Permitted</h3>
+        <p>84% of developers use AI daily. We test how you use it -- judgment, structuring, and execution with AI as a co-pilot.</p>
+      </div>
+      <div class="card fade-in stagger-4">
+        <div class="card-tag blue">[PIPELINE]</div>
+        <h3>Direct Hiring Pipeline</h3>
+        <p>Top performers are mapped directly to participating companies for internship and entry-level interviews. Built for outcomes -- not certificates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMAT -->
+<section class="section" id="format">
+  <div class="container">
+    <div class="section-label fade-in">ls ./format/</div>
+    <div class="section-title fade-in">How VantaX works.</div>
+    <div class="terminal fade-in">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">vantax-format.sh</span>
+      </div>
+      <div class="terminal-body" style="padding:0;">
+        <div class="format-grid">
+          <div class="format-item"><div class="label">MODE</div><h4>Fully Online</h4><p>Participate from anywhere</p></div>
+          <div class="format-item"><div class="label">TYPE</div><h4>Individual</h4><p>Your execution. Your signal.</p></div>
+          <div class="format-item"><div class="label">COUNT</div><h4>3 Challenges</h4><p>3 assessments over one week</p></div>
+          <div class="format-item"><div class="label">TIMER</div><h4>2-Hour Window</h4><p>Per challenge. Auto-lock.</p></div>
+          <div class="format-item"><div class="label">TOOLS</div><h4>AI Permitted</h4><p>Use any AI tool you want</p></div>
+          <div class="format-item"><div class="label">OUTPUT</div><h4>Code + Explanation</h4><p>Structured submission format</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RUBRIC -->
+<section class="section" id="rubric">
+  <div class="container">
+    <div class="section-label fade-in">cat rubric.json</div>
+    <div class="section-title fade-in">How you're evaluated.</div>
+    <div class="terminal fade-in">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">scoring-rubric</span>
+      </div>
+      <div class="terminal-body">
+        <div class="rubric-item"><div class="rubric-weight">25<span>%</span></div><div class="rubric-bar"><h4>Execution Quality</h4><div class="rubric-bar-track"><div class="rubric-bar-fill" data-width="100%"></div></div><div class="rubric-desc">Does it work? Is the code clean and functional?</div></div></div>
+        <div class="rubric-item"><div class="rubric-weight">20<span>%</span></div><div class="rubric-bar"><h4>Problem Understanding</h4><div class="rubric-bar-track"><div class="rubric-bar-fill" data-width="80%"></div></div><div class="rubric-desc">Did they grasp the business context and constraints?</div></div></div>
+        <div class="rubric-item"><div class="rubric-weight">20<span>%</span></div><div class="rubric-bar"><h4>Logical Structuring</h4><div class="rubric-bar-track"><div class="rubric-bar-fill" data-width="80%"></div></div><div class="rubric-desc">Is the approach organized and defensible?</div></div></div>
+        <div class="rubric-item"><div class="rubric-weight">20<span>%</span></div><div class="rubric-bar"><h4>Practical Feasibility</h4><div class="rubric-bar-track"><div class="rubric-bar-fill" data-width="80%"></div></div><div class="rubric-desc">Could this be used in a real environment?</div></div></div>
+        <div class="rubric-item"><div class="rubric-weight">15<span>%</span></div><div class="rubric-bar"><h4>Communication Clarity</h4><div class="rubric-bar-track"><div class="rubric-bar-fill" data-width="60%"></div></div><div class="rubric-desc">Can you understand it without a walkthrough?</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="section" id="timeline">
+  <div class="container">
+    <div class="section-label fade-in">cat timeline.md</div>
+    <div class="section-title fade-in">From registration to results -- one week.</div>
+    <div class="terminal fade-in">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">event-schedule</span>
+      </div>
+      <div class="terminal-body">
+        <div class="timeline-item fade-in stagger-1"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">09 Mar 2026</div><div class="timeline-content"><h4>Registration Opens</h4><p>Early registration begins -- seats capped per problem</p></div></div>
+        <div class="timeline-item fade-in stagger-2"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">14 Apr 2026</div><div class="timeline-content"><h4>Jury & Partner Announcement</h4><p>Jury panel, partnerships, and sponsors revealed</p></div></div>
+        <div class="timeline-item fade-in stagger-3"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">23 Apr 2026</div><div class="timeline-content"><h4>VantaX 2026 Launches</h4><p>Event goes live -- registration closes at launch</p></div></div>
+        <div class="timeline-item fade-in stagger-4"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">25 Apr 2026</div><div class="timeline-content"><h4>Challenge 1 -- Submissions Open</h4><p>2-day window &middot; 2-hour timed assessment</p></div></div>
+        <div class="timeline-item fade-in stagger-5"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">27 Apr 2026</div><div class="timeline-content"><h4>Challenge 2 -- Submissions Open</h4><p>2-day window &middot; 2-hour timed assessment</p></div></div>
+        <div class="timeline-item fade-in stagger-6"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">29 Apr 2026</div><div class="timeline-content"><h4>Challenge 3 -- Submissions Open</h4><p>2-day window &middot; 2-hour timed assessment</p></div></div>
+        <div class="timeline-item fade-in stagger-7"><div class="timeline-marker">&rsaquo;</div><div class="timeline-date">01 May 2026</div><div class="timeline-content"><h4>Top 10 + Final Results</h4><p>Leaderboard published &middot; Top performers shortlisted</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <h2 class="fade-in"><span class="purple">Build.</span> Submit. <span class="gold">Get seen.</span></h2>
+    <p class="sub fade-in">3 challenges. 2 hours each. ₹199 + GST for the entire event.</p>
+    <p class="price fade-in">Top performers earn the VantaX Verified Builder Badge.</p>
+    <div class="fade-in">
+      <button class="btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Register Now &rarr;</button>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTRATION FORM -->
+<section class="reg-section" id="register">
+  <div class="container">
+    <div class="terminal fade-in" style="max-width:640px;margin:0 auto;">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">vantax --register</span>
+      </div>
+      <div class="terminal-body">
+        <h2 style="color:#fff;font-size:22px;font-weight:700;margin-bottom:4px;">Apply for VantaX 2026</h2>
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:4px;">Seats capped per problem. Once full, registration closes.</p>
+        <p style="color:var(--gold);font-size:12px;font-family:var(--font-mono);margin-bottom:28px;">₹199 + GST -- Access all 3 challenges + structured hiring exposure</p>
+
+        <div class="form-section-label">BASIC_INFO</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">full_name <span class="req">*</span></label><input class="form-input" placeholder="Your full name"></div>
+          <div class="form-group"><label class="form-label">email <span class="req">*</span></label><input class="form-input" placeholder="you@email.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">phone <span class="req">*</span></label><input class="form-input" placeholder="+91 98765 43210"></div>
+          <div class="form-group"><label class="form-label">linkedin_url <span class="req">*</span></label><input class="form-input" placeholder="https://linkedin.com/in/..."></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">resume.pdf <span class="req">*</span></label>
+          <div class="upload-zone">[ click to upload ] -- PDF, max 5MB<br><span style="font-size:10px;color:var(--text-muted);">For reference only -- your execution in the challenges is what gets evaluated.</span></div>
+        </div>
+
+        <div class="form-section-label">OPTIONAL</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">college</label><input class="form-input" placeholder="Your institution"></div>
+          <div class="form-group"><label class="form-label">graduation_year</label><input class="form-input" placeholder="e.g. 2026"></div>
+        </div>
+        <div class="form-group"><label class="form-label">degree_branch</label><input class="form-input" placeholder="e.g. B.Tech CSE"></div>
+        <div class="form-group"><label class="form-label">referral_source</label><input class="form-input" placeholder="LinkedIn, friend, college, etc."></div>
+
+        <button class="submit-btn">$ register --pay ₹235 &rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-label fade-in">man vantax</div>
+    <div class="section-title fade-in">Frequently asked questions.</div>
+    <div class="terminal fade-in">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">faq</span>
+      </div>
+      <div class="terminal-body">
+        <div class="faq-item"><div class="faq-q">Is this beginner-friendly?</div><div class="faq-a">VantaX is designed for early-career builders -- final-year students, recent graduates, and anyone with 0-2 years of experience. You don't need to be an expert, but you need to think clearly and execute.</div></div>
+        <div class="faq-item"><div class="faq-q">What languages/tools are allowed?</div><div class="faq-a">Any language, any framework, any AI tool. We evaluate your output -- not your stack.</div></div>
+        <div class="faq-item"><div class="faq-q">Can non-CS students apply?</div><div class="faq-a">Absolutely. If you can break down a problem and build a solution, your degree doesn't matter.</div></div>
+        <div class="faq-item"><div class="faq-q">Can I participate in multiple challenges?</div><div class="faq-a">Yes. There are 3 challenges across the week. You can attempt all three. Each is independent with its own leaderboard.</div></div>
+        <div class="faq-item"><div class="faq-q">Is it free or paid?</div><div class="faq-a">₹199 + GST to register. Access all 3 challenges, structured hiring exposure, and a direct path to participating companies.</div></div>
+        <div class="faq-item"><div class="faq-q">Can I retake a challenge?</div><div class="faq-a">No. Each challenge has a single submission window. This isn't a practice test -- it's a hiring audition.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POWERED BY -->
+<section class="powered">
+  <div class="container">
+    <div class="section-label fade-in">cat powered_by.md</div>
+    <div style="margin-top:24px;">
+      <img src="app/public/brand/vantahire-logo-white.svg" alt="VantaHire" class="powered-logo fade-in">
+      <div class="powered-item fade-in stagger-1">Built by talent leaders who scaled teams at product companies</div>
+      <div class="powered-item fade-in stagger-2">Bangalore-based, hiring-first platform</div>
+      <div class="powered-item fade-in stagger-3">Connecting execution-verified talent directly to companies ready to hire</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-divider">════════════════════════════════════════════════</div>
+    <img src="app/public/brand/vantax-logo.png" alt="VantaX" class="logo-img">
+    <div class="tagline">Human decisions, AI acceleration.</div>
+    <div class="links">
+      <a href="#">what_is_vantax</a>
+      <a href="#">companies</a>
+      <a href="#">jury</a>
+      <a href="#">admin</a>
+    </div>
+    <div class="copy">VantaHire &middot; Bangalore, India &middot; hello@vantahire.com<br>&copy; 2026 VantaHire. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+// Intersection Observer for scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Rubric bar fill animation on scroll
+const rubricObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const fills = entry.target.querySelectorAll('.rubric-bar-fill');
+      fills.forEach((fill, i) => {
+        setTimeout(() => {
+          fill.style.width = fill.dataset.width;
+        }, i * 150);
+      });
+      rubricObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+const rubricSection = document.getElementById('rubric');
+if (rubricSection) rubricObserver.observe(rubricSection);
+
+// Stat counter animation
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const valueEl = entry.target.querySelector('.stat-value');
+      const target = valueEl.textContent;
+      const numMatch = target.match(/[\d.]+/);
+      if (!numMatch) return;
+
+      const num = parseFloat(numMatch[0]);
+      const suffix = target.replace(numMatch[0], '');
+      const isDecimal = target.includes('.');
+      const duration = 1200;
+      const start = performance.now();
+
+      function tick(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = num * eased;
+        valueEl.textContent = (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-card').forEach(el => counterObserver.observe(el));
+
+// Typing animation for hero prompt
+const prompt = document.querySelector('.hero-prompt');
+if (prompt) {
+  const html = prompt.innerHTML;
+  prompt.innerHTML = '';
+  prompt.style.visibility = 'visible';
+  let i = 0;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  const text = tempDiv.textContent;
+
+  // Show the full HTML after typing finishes
+  function typeChar() {
+    if (i <= text.length) {
+      prompt.textContent = text.substring(0, i);
+      i++;
+      setTimeout(typeChar, 35 + Math.random() * 25);
+    } else {
+      prompt.innerHTML = html;
+    }
+  }
+  setTimeout(typeChar, 1000);
+}
+</script>
+
+</body>
+</html>

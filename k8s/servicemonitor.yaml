@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vibe-api
+  namespace: vibe
+  labels:
+    app: vibe
+    prometheus: main
+spec:
+  selector:
+    matchLabels:
+      app: vibe
+      component: api
+  namespaceSelector:
+    matchNames:
+      - vibe
+  endpoints:
+    - port: http
+      path: /api/v1/prometheus/metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      # No auth required for metrics endpoint (internal network only)

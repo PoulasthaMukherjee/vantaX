@@ -1,6 +1,12 @@
-node_modules
-dist
+# === VantaX (Frontend) ===
+node_modules/
+dist/
+build/
+.next/
 .env
+.env.local
+.env.*.local
+!.env.example
 public/uploads/*
 !public/uploads/.gitkeep
 *:Zone.Identifier
@@ -13,3 +19,45 @@ public/uploads/*
 !app/public/hero-image.avif
 .claude/
 0[1-6]_VantaX_*
+
+# === Vibe (Backend - Python) ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Alembic
+alembic/versions/*.pyc
+
+# Test artifacts
+coverage.xml
+*.cover
+
+# Resumes and uploads (stored in cloud, not repo)
+uploads/
+resumes/
+
+# === Shared ===
+*.log
+npm-debug.log*
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+tmp/
+temp/
+*.tmp
+firebase-debug.log
