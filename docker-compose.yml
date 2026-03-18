@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: vibe-postgres
+    environment:
+      POSTGRES_USER: vibe
+      POSTGRES_PASSWORD: vibe_dev_password
+      POSTGRES_DB: vibe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vibe -d vibe"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vibe-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (for local development with hot reload)
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vibe-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://vibe:vibe_dev_password@postgres:5432/vibe
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    profiles:
+      - full
+
+  # RQ Worker
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vibe-worker
+    environment:
+      - DATABASE_URL=postgresql://vibe:vibe_dev_password@postgres:5432/vibe
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: rq worker --url redis://redis:6379/0 scoring
+    profiles:
+      - full
+
+  # Scheduler (cleanup + alerts)
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vibe-scheduler
+    environment:
+      - DATABASE_URL=postgresql://vibe:vibe_dev_password@postgres:5432/vibe
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: python -m app.worker.scheduler
+    profiles:
+      - full
+
+volumes:
+  postgres_data:
+  redis_data:
