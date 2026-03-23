@@ -20,6 +20,7 @@ const schemaStatements = [
       graduation_year varchar(10),
       degree_branch varchar(255),
       referral_source varchar(255),
+      account_status varchar(50) DEFAULT 'inactive',
       payment_status varchar(50) DEFAULT 'pending',
       payment_id varchar(255),
       created_at timestamp DEFAULT now()
@@ -127,6 +128,7 @@ const schemaStatements = [
   { name: 'companies.final_round_attendee_name', statement: 'ALTER TABLE companies ADD COLUMN IF NOT EXISTS final_round_attendee_name varchar(255)' },
   { name: 'companies.final_round_attendee_role', statement: 'ALTER TABLE companies ADD COLUMN IF NOT EXISTS final_round_attendee_role varchar(255)' },
   { name: 'companies.suggest_challenge', statement: 'ALTER TABLE companies ADD COLUMN IF NOT EXISTS suggest_challenge boolean DEFAULT false' },
+  { name: 'candidates.account_status', statement: "ALTER TABLE candidates ADD COLUMN IF NOT EXISTS account_status varchar(50) DEFAULT 'inactive'" },
 ];
 
 export async function ensureDatabaseSchema() {

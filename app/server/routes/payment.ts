@@ -8,10 +8,11 @@ import { candidateConfirmationEmail, candidateNotificationEmail } from '../email
 
 const router = Router();
 
-const isProduction = (process.env.CASHFREE_ENV || '').toLowerCase() === 'production';
-const CASHFREE_API = isProduction
-  ? 'https://api.cashfree.com/pg/orders'
-  : 'https://sandbox.cashfree.com/pg/orders';
+// Log on startup so we can see whether credentials were loaded
+setTimeout(() => {
+  const appId = process.env.CASHFREE_APP_ID;
+  console.log('[payment] CASHFREE_APP_ID loaded:', appId ? `${appId.slice(0, 8)}…` : 'MISSING');
+}, 0);
 
 // POST /create-order — Create Cashfree order, return paymentSessionId
 router.post('/create-order', async (req: Request, res: Response) => {
@@ -26,19 +27,32 @@ router.post('/create-order', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Candidate not found' });
     }
 
-    if (candidate.paymentStatus === 'completed') {
+    if (candidate.paymentStatus === 'completed' || candidate.accountStatus === 'active') {
       return res.status(409).json({ error: 'Payment already completed' });
     }
 
     const orderId = `VX_${candidateId}_${Date.now()}`;
 
+    // Read env vars per-request so hot-reload picks them up
+    const isProduction = (process.env.CASHFREE_ENV || '').toLowerCase() === 'production';
+    const CASHFREE_API = isProduction
+      ? 'https://api.cashfree.com/pg/orders'
+      : 'https://sandbox.cashfree.com/pg/orders';
+    const appId = process.env.CASHFREE_APP_ID || '';
+    const secretKey = process.env.CASHFREE_SECRET_KEY || '';
+
+    if (!appId || !secretKey) {
+      console.error('[payment] Cashfree credentials missing in .env');
+      return res.status(500).json({ error: 'Payment not configured' });
+    }
+
     const response = await fetch(CASHFREE_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-version': '2022-09-01',
-        'x-client-id': process.env.CASHFREE_APP_ID!,
-        'x-client-secret': process.env.CASHFREE_SECRET_KEY!,
+        'x-api-version': '2023-08-01',
+        'x-client-id': appId,
+        'x-client-secret': secretKey,
       },
       body: JSON.stringify({
         order_id: orderId,
@@ -51,7 +65,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
           customer_phone: candidate.phone,
         },
         order_meta: {
-          return_url: `${req.headers.origin || process.env.APP_URL || ''}/?payment=success&order_id=${orderId}`,
+          return_url: `${req.headers.origin || process.env.APP_URL || ''}/dashboard?payment=success&order_id=${orderId}`,
         },
       }),
     });
@@ -123,7 +137,11 @@ router.post('/webhook', async (req: Request, res: Response) => {
       }
 
       await db.update(candidates)
-        .set({ paymentStatus: 'completed', paymentId: String(paymentId || orderId) })
+        .set({
+          paymentStatus: 'completed',
+          paymentId: String(paymentId || orderId),
+          accountStatus: 'active',
+        })
         .where(eq(candidates.id, candidateId));
 
       const [candidate] = await db.select().from(candidates).where(eq(candidates.id, candidateId));
@@ -140,7 +158,11 @@ router.post('/webhook', async (req: Request, res: Response) => {
       }
     } else if (eventType === 'PAYMENT_FAILED_WEBHOOK' || eventType === 'PAYMENT_USER_DROPPED_WEBHOOK') {
       await db.update(candidates)
-        .set({ paymentStatus: 'failed', paymentId: String(paymentId || orderId) })
+        .set({
+          paymentStatus: 'failed',
+          paymentId: String(paymentId || orderId),
+          accountStatus: 'inactive',
+        })
         .where(eq(candidates.id, candidateId));
     }
 
@@ -152,7 +174,7 @@ router.post('/webhook', async (req: Request, res: Response) => {
   }
 });
 
-// POST /verify — Frontend polls this after redirect to check payment status
+// POST /verify — Frontend polls this; actively queries Cashfree so it works without webhooks
 router.post('/verify', async (req: Request, res: Response) => {
   try {
     const { orderId } = req.body;
@@ -171,11 +193,72 @@ router.post('/verify', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Candidate not found' });
     }
 
-    res.json({ paymentStatus: candidate.paymentStatus });
+    // Already completed — no need to query Cashfree
+    if (candidate.paymentStatus === 'completed') {
+      return res.json({ paymentStatus: 'completed' });
+    }
+
+    // Query Cashfree directly for the real-time order status
+    const isProduction = (process.env.CASHFREE_ENV || '').toLowerCase() === 'production';
+    const cfBase = isProduction
+      ? 'https://api.cashfree.com/pg'
+      : 'https://sandbox.cashfree.com/pg';
+    const appId = process.env.CASHFREE_APP_ID || '';
+    const secretKey = process.env.CASHFREE_SECRET_KEY || '';
+
+    if (appId && secretKey) {
+      const cfRes = await fetch(`${cfBase}/orders/${orderId}`, {
+        headers: {
+          'x-api-version': '2023-08-01',
+          'x-client-id': appId,
+          'x-client-secret': secretKey,
+        },
+      });
+
+      if (cfRes.ok) {
+        const cfOrder = await cfRes.json();
+        console.log(`[verify] Cashfree order_status for ${orderId}:`, cfOrder.order_status);
+
+        if (cfOrder.order_status === 'PAID') {
+          // Update DB — this is the webhook fallback for local dev
+          await db.update(candidates)
+            .set({
+              paymentStatus: 'completed',
+              accountStatus: 'active',
+              paymentId: String(cfOrder.cf_order_id || orderId),
+            })
+            .where(eq(candidates.id, candidateId));
+
+          // Send emails if not already sent (best-effort)
+          try {
+            const [fresh] = await db.select().from(candidates).where(eq(candidates.id, candidateId));
+            const emailService = await getEmailService();
+            if (emailService && fresh) {
+              const notificationTo = process.env.NOTIFICATION_EMAIL || 'hello@vantahire.com';
+              emailService.sendEmail({ to: notificationTo, ...candidateNotificationEmail(fresh) }).catch(() => {});
+              emailService.sendEmail({ to: fresh.email, ...candidateConfirmationEmail(fresh) }).catch(() => {});
+            }
+          } catch { /* non-fatal */ }
+
+          return res.json({ paymentStatus: 'completed' });
+        }
+
+        if (cfOrder.order_status === 'EXPIRED') {
+          await db.update(candidates)
+            .set({ paymentStatus: 'failed' })
+            .where(eq(candidates.id, candidateId));
+          return res.json({ paymentStatus: 'failed' });
+        }
+      }
+    }
+
+    // Default: return whatever is in DB (pending / failed)
+    res.json({ paymentStatus: candidate.paymentStatus ?? 'pending' });
   } catch (e) {
     console.error('Verify error:', e);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 export default router;

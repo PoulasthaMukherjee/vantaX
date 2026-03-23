@@ -44,6 +44,9 @@ class Event(BaseModel):
     # Creator
     created_by: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
+    # Integration mapping
+    external_id: Mapped[str | None] = mapped_column(String(100), index=True)
+
     # Basic info
     title: Mapped[str] = mapped_column(String(255))
     slug: Mapped[str] = mapped_column(String(100))
@@ -162,6 +165,9 @@ class EventRegistration(BaseModel):
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
     )
+
+    # Integration mapping
+    external_id: Mapped[str | None] = mapped_column(String(100), index=True)
 
     # Registration details
     registered_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)

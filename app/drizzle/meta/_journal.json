@@ -15,6 +15,13 @@
       "when": 1773302595769,
       "tag": "0001_safe_union_jack",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773923493077,
+      "tag": "0002_fuzzy_madame_hydra",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,8 @@ import fs from 'fs';
 import { ensureDatabaseSchema } from './db';
 import { injectMeta } from './routeMeta';
 import adminRouter from './routes/admin';
+import authRouter from './routes/auth';
+import auditionsRouter from './routes/auditions';
 import candidatesRouter from './routes/candidates';
 import companiesRouter from './routes/companies';
 import companyFlowRouter from './routes/companyFlow';
@@ -30,6 +32,7 @@ const SPA_ROUTES = [
   '/privacy',
   '/terms',
   '/refund',
+  '/dashboard',
 ];
 
 // Routes with dynamic segments
@@ -38,6 +41,11 @@ function isKnownRoute(url: string): boolean {
   if (SPA_ROUTES.includes(pathname)) return true;
   if (/^\/companies\/draft\/[^/]+$/.test(pathname)) return true;
   if (/^\/companies\/submitted\/[^/]+$/.test(pathname)) return true;
+  if (/^\/auditions\/[^/]+$/.test(pathname)) return true;
+  if (/^\/auditions\/[^/]+\/round\/[^/]+$/.test(pathname)) return true;
+  if (/^\/auditions\/[^/]+\/leaderboard$/.test(pathname)) return true;
+  if (/^\/admin\/reviews(\/.*)?$/.test(pathname)) return true;
+  if (/^\/admin\/auditions(\/.*)?$/.test(pathname)) return true;
   return false;
 }
 
@@ -83,6 +91,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Health check endpoint for Railway
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.use('/api/auth', authRouter);
+app.use('/api/auditions', auditionsRouter);
 app.use('/api/candidates', candidatesRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/company-flow', companyFlowRouter);

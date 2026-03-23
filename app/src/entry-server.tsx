@@ -1,6 +1,7 @@
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import { HelmetProvider } from 'react-helmet-async';
+import type { HelmetServerState } from 'react-helmet-async';
 import { Routes, Route } from 'react-router-dom';
 import PageLayout from './components/layout/PageLayout';
 
@@ -39,15 +40,8 @@ function ServerApp() {
   );
 }
 
-interface HelmetData {
-  title?: { toString(): string };
-  meta?: { toString(): string };
-  link?: { toString(): string };
-  script?: { toString(): string };
-}
-
-export function render(url: string): { html: string; helmet: HelmetData | undefined } {
-  const helmetContext: { helmet?: HelmetData } = {};
+export function render(url: string): { html: string; helmet: HelmetServerState | undefined } {
+  const helmetContext: { helmet?: HelmetServerState } = {};
 
   const html = renderToString(
     <HelmetProvider context={helmetContext}>

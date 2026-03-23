@@ -44,6 +44,9 @@ class Assessment(BaseModel):
     # Creator
     created_by: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
+    # Integration mapping
+    external_id: Mapped[str | None] = mapped_column(String(100), index=True)
+
     # Basic info
     title: Mapped[str] = mapped_column(String(255))
 

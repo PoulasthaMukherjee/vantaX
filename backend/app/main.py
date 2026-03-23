@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.public import router as public_router
 from app.api.v1.router import router as api_v1_router
+from app.api.internal.router import router as internal_router
 from app.core.config import settings
 from app.core.security import init_firebase
 
@@ -139,6 +140,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 app.include_router(api_v1_router)
 app.include_router(public_router, prefix="/api/public")
+app.include_router(internal_router, prefix="/api")
 
 
 # =============================================================================

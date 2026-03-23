@@ -63,6 +63,9 @@ class Submission(BaseModel):
         index=True,
     )
 
+    # Integration mapping
+    external_id: Mapped[str | None] = mapped_column(String(100), index=True)
+
     # Submission content
     # submission_type: "github" for GitHub URL, "file_upload" for uploaded files
     submission_type: Mapped[str] = mapped_column(String(20), default="github")

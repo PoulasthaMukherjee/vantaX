@@ -57,15 +57,6 @@ export interface CompanyFlowDraft {
   updatedAt: string | null;
 }
 
-export async function submitCandidate(formData: FormData) {
-  const res = await fetch(`${BASE}/candidates`, { method: 'POST', body: formData });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Submission failed');
-  }
-  return res.json();
-}
-
 export async function submitCompany(data: Record<string, any>) {
   const res = await fetch(`${BASE}/companies`, {
     method: 'POST',
@@ -203,6 +194,82 @@ export async function verifyPayment(orderId: string) {
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error || 'Failed to verify payment');
+  }
+  return res.json();
+}
+
+import { auth } from './firebase';
+
+export async function getAuthToken(): Promise<string | null> {
+  if (!auth.currentUser) return null;
+  return auth.currentUser.getIdToken();
+}
+
+export async function authedFetch(url: string, options: RequestInit = {}) {
+  const token = await getAuthToken();
+  const headers = new Headers(options.headers);
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  return fetch(url, { ...options, headers });
+}
+
+export async function getMe() {
+  const res = await authedFetch(`${BASE}/auth/me`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to fetch user');
+  }
+  return res.json();
+}
+
+export async function submitProfile(fd: FormData) {
+  const res = await authedFetch(`${BASE}/candidates/profile`, {
+    method: 'POST',
+    body: fd,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to submit profile');
+  }
+  return res.json();
+}
+
+export async function updateProfile(fd: FormData) {
+  const res = await authedFetch(`${BASE}/candidates/profile`, {
+    method: 'PUT',
+    body: fd,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to update profile');
+  }
+  return res.json();
+}
+
+// ==========================================
+// Phase 1: Auditions
+// ==========================================
+
+export async function getAuditions() {
+  const res = await fetch(`${BASE}/auditions`);
+  if (!res.ok) throw new Error('Failed to fetch auditions');
+  return res.json();
+}
+
+export async function getAudition(slug: string) {
+  const res = await fetch(`${BASE}/auditions/${slug}`);
+  if (!res.ok) throw new Error('Failed to fetch audition');
+  return res.json();
+}
+
+export async function registerForAudition(slug: string) {
+  const res = await authedFetch(`${BASE}/auditions/${slug}/register`, {
+    method: 'POST'
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to register');
   }
   return res.json();
 }

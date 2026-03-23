@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, serial, varchar, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, serial, varchar, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
 
 export const candidates = pgTable('candidates', {
   id: serial('id').primaryKey(),
@@ -11,6 +11,7 @@ export const candidates = pgTable('candidates', {
   graduationYear: varchar('graduation_year', { length: 10 }),
   degreeBranch: varchar('degree_branch', { length: 255 }),
   referralSource: varchar('referral_source', { length: 255 }),
+  accountStatus: varchar('account_status', { length: 50 }).default('inactive'),
   paymentStatus: varchar('payment_status', { length: 50 }).default('pending'),
   paymentId: varchar('payment_id', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow(),
@@ -99,4 +100,78 @@ export const juryMembers = pgTable('jury_members', {
   availability: varchar('availability', { length: 50 }),
   motivation: text('motivation'),
   createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const candidateUsers = pgTable('candidate_users', {
+  id: serial('id').primaryKey(),
+  firebaseUid: varchar('firebase_uid', { length: 255 }).notNull().unique(),
+  email: varchar('email', { length: 255 }).notNull(),
+  fullName: varchar('full_name', { length: 255 }).notNull(),
+  emailVerified: boolean('email_verified').default(false),
+  candidateId: integer('candidate_id').references(() => candidates.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const auditions = pgTable('auditions', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 255 }).notNull().unique(),
+  title: varchar('title', { length: 255 }).notNull(),
+  companyDraftId: integer('company_draft_id').references(() => companyAuditionDrafts.id),
+  status: varchar('status', { length: 50 }).default('draft'),
+  vibeEventId: varchar('vibe_event_id', { length: 255 }),
+  round1Open: boolean('round1_open').default(false),
+  round2Open: boolean('round2_open').default(false),
+  publishedAt: timestamp('published_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const auditionRegistrations = pgTable('audition_registrations', {
+  id: serial('id').primaryKey(),
+  auditionId: integer('audition_id').references(() => auditions.id).notNull(),
+  candidateUserId: integer('candidate_user_id').references(() => candidateUsers.id).notNull(),
+  vibeParticipantId: varchar('vibe_participant_id', { length: 255 }),
+  registrationStatus: varchar('registration_status', { length: 50 }).default('registered'),
+  registeredAt: timestamp('registered_at').defaultNow(),
+});
+
+export const auditionRounds = pgTable('audition_rounds', {
+  id: serial('id').primaryKey(),
+  auditionId: integer('audition_id').references(() => auditions.id).notNull(),
+  roundNumber: integer('round_number').notNull(),
+  vibeAssessmentId: varchar('vibe_assessment_id', { length: 255 }),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  startTime: timestamp('start_time'),
+  endTime: timestamp('end_time'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const auditionSubmissions = pgTable('audition_submissions', {
+  id: serial('id').primaryKey(),
+  registrationId: integer('registration_id').references(() => auditionRegistrations.id).notNull(),
+  roundId: integer('round_id').references(() => auditionRounds.id).notNull(),
+  vibeSubmissionId: varchar('vibe_submission_id', { length: 255 }),
+  repoUrl: text('repo_url'),
+  status: varchar('status', { length: 50 }).notNull().default('pending'),
+  score: integer('score'),
+  submittedAt: timestamp('submitted_at').defaultNow(),
+});
+
+export const submissionReviews = pgTable('submission_reviews', {
+  id: serial('id').primaryKey(),
+  submissionId: integer('submission_id').references(() => auditionSubmissions.id).notNull(),
+  reviewerId: integer('reviewer_id').references(() => juryMembers.id).notNull(),
+  scoreCriteria: jsonb('score_criteria'),
+  finalScore: integer('final_score').notNull(),
+  feedback: text('feedback'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const leaderboardSnapshots = pgTable('leaderboard_snapshots', {
+  id: serial('id').primaryKey(),
+  auditionId: integer('audition_id').references(() => auditions.id).notNull(),
+  snapshotData: jsonb('snapshot_data').notNull(),
+  generatedAt: timestamp('generated_at').defaultNow(),
 });
